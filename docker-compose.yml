@@ -1,0 +1,44 @@
+version: '3.7'
+services:
+  crypto_tracker:
+    build: .
+    image: python:crypto_tracker
+    container_name: crypto_tracker.dev
+    tty: true
+    stdin_open: true
+    restart: always
+    ports:
+      - 8000:8000
+    volumes:
+      - ./crypto_tracker:/app
+    depends_on:
+      - db
+    links:
+      - db:postgres
+    command: >
+      bash -c "python wait_for_postgres.py &&
+               python manage.py migrate &&
+               python manage.py collectstatic --noinput &&
+               gunicorn crypto_tracker.wsgi --bind 0.0.0.0:8000"
+  db:
+    image: postgres
+    container_name: tracker_database.db
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+    env_file:
+      - ./crypto_tracker/crypto_tracker/local_settings.py
+  nginx:
+    build: ./nginx/.
+    image: nginx:crypto_tracker
+    container_name: crypto_tracker.nginx
+    restart: always
+    ports:
+      - 80:80
+    links:
+      - crypto_tracker:crypto_tracker
+    volumes:
+      - ./crypto_tracker/media:/app/media
+      - ./crypto_tracker/static:/app/static
