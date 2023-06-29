@@ -162,3 +162,4 @@ cython_debug/
 dbdata/
 crypto_tracker/static/
 crypto_tracker/media/
+ccxt_test/
