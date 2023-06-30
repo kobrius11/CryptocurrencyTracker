@@ -9,7 +9,11 @@
     </head>
 
     <body>
-
+        <div class='navbar'>
+            <a class="button" href={% url 'chart' %}>Chart</a>
+            <a class="button" href={% url 'news' %}>News</a>
+            <a></a>
+        </div>
     </body>
     <main>
         {% block content %}

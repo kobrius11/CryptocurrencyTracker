@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<ul class="articles-wrapper">
+    {% for article in articles %}
+    
+    <li class='article-container'>
+        <a href="https://{{ article.link }}">
+            <img src={{ article.img }}>
+            <p>{{ article.title }}</p></a>
+        <p>{{ article.datetime }}</p>
+        <p>{{ article.date }}</p>
+    </li>
+    
+    {% endfor %}
+</ul>
+
+{% endblock content %}
+

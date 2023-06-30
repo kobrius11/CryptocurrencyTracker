@@ -26,12 +26,14 @@ SECRET_KEY = local_settings.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cryptotracker.local', ]
+ALLOWED_HOSTS = ['cryptotracker.local', 'localhost']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'website',
+    'user_profile',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
