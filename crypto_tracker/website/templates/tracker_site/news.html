@@ -2,13 +2,26 @@
 
 {% block content %}
 
+<form class="search-bar-wrapper" method="get">
+    {% csrf_token %}
+    <p class="search-bar-container">
+        <label for="search">Search: </label><br>
+        <input type="text" name="search" value="{{ request.POST.search }}">
+    </p>
+    <button type="submit">GO!</button>
+</form>
+
 <ul class="articles-wrapper">
     {% for article in articles %}
     
     <li class='article-container'>
         <a href="https://{{ article.link }}">
             <img src={{ article.img }}>
+            {% if article.title|length > 107 %}
+                <p>{{ article.title|truncatewords:12 }}</p></a>
+            {% else %}
             <p>{{ article.title }}</p></a>
+            {% endif %}
         <p>{{ article.datetime }}</p>
         <p>{{ article.date }}</p>
     </li>
