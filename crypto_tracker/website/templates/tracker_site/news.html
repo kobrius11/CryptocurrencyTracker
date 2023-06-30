@@ -2,20 +2,36 @@
 
 {% block content %}
 
-<form class="search-bar-wrapper" method="get">
-    {% csrf_token %}
-    <p class="search-bar-container">
-        <label for="search">Search: </label><br>
-        <input type="text" name="search" value="{{ request.POST.search }}">
-    </p>
-    <button type="submit">GO!</button>
-</form>
+<div class="news-upper-container">
+    <div class="container">
+        <h1 class="news-title">News Flow</h1>
+        <p class="news-description">Follow what's happening with real-time updates from around the world.</p>
+    </div>
+
+    <form class="search-bar-wrapper" method="get">
+        {% csrf_token %}
+        <div class="search-bar-container">
+            <label for="search">Search: </label><br>
+            <input class="search-bar" placeholder="Search something :)" type="search" name="search" value="{{ request.POST.search }}">
+            <button class="button-primary" type="submit">GO!</button>
+        </div>
+        <div>
+            <button class="button-secondary" name="search" value="Crypto" type="submit">Crypto</button>
+            <button class="button-secondary" name="search" value="Stocks" type="submit">Stocks</button>
+            <button class="button-secondary" name="search" value="Forex" type="submit">Forex</button>
+            <button class="button-secondary" name="search" value="Futures" type="submit">Futures</button>
+            <button class="button-secondary" name="search" value="Indices" type="submit">Indices</button>
+            <button class="button-secondary" name="search" value="Bonds" type="submit">Bonds</button>
+            <button class="button-secondary" name="search" value="World economy" type="submit">World economy</button>
+        </div>
+    </form>
+</div>
 
 <ul class="articles-wrapper">
     {% for article in articles %}
     
     <li class='article-container'>
-        <a href="https://{{ article.link }}">
+        <a href="https://{{ article.link }}" alt="Article Image">
             <img src={{ article.img }}>
             {% if article.title|length > 107 %}
                 <p>{{ article.title|truncatewords:12 }}</p></a>

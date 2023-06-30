@@ -10,9 +10,11 @@
 
     <body>
         <div class='navbar'>
-            <a class="button" href={% url 'chart' %}>Chart</a>
-            <a class="button" href={% url 'news' %}>News</a>
-            <a></a>
+            <ul class='navbar-wrapper'>
+                <li class='navbar-item'><a class="button" href={% url 'chart' %}>Chart</a></li>
+                <li class='navbar-item'><a class="button" href={% url 'news' %}>News</a></li>
+                <li class='navbar-item'><a></a></li>
+            </ul>
         </div>
     </body>
     <main>
