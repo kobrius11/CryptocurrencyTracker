@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form enctype="multipart/form-data" method="get">
+  {% csrf_token %}
+  {{ form.as_div }}
+  {% if trading_view == "True" %}
+    <button class="button-secondary" name="tradingview_button" value=False type="submit">Close Trading view</button>
+  {% else %}
+    <button class="button-secondary" name="tradingview_button" value=True type="submit">Open Trading view</button>
+  {% endif %}
+  <div>
+      <label for="id_exchange">exchange choice:</label>
+      <select name="exchange" id="id_exchange">
+        {% comment %} <option value="ace">ace</option>
+        <option value="alpaca">alpaca</option>
+        <option value="ascendex">ascendex</option>
+        <option value="bequant">bequant</option>
+        <option value="bigone">bigone</option>
+        <option value="binance">binance</option>
+        <option value="binancecoinm">binancecoinm</option>
+        <option value="binanceus">binanceus</option>
+        <option value="binanceusdm">binanceusdm</option>
+        <option value="bit2c">bit2c</option>
+        <option value="bitbank">bitbank</option>
+        <option value="bitbay">bitbay</option>
+        <option value="bitbns">bitbns</option>
+        <option value="bitcoincom">bitcoincom</option>
+        <option value="bitfinex">bitfinex</option>
+        <option value="bitfinex2">bitfinex2</option>
+        <option value="bitflyer">bitflyer</option>
+        <option value="bitforex">bitforex</option>
+        <option value="bitget">bitget</option>
+        <option value="bithumb">bithumb</option>
+        <option value="bitmart">bitmart</option>
+        <option value="bitmex">bitmex</option>
+        <option value="bitopro">bitopro</option>
+        <option value="bitpanda">bitpanda</option>
+        <option value="bitrue">bitrue</option>
+        <option value="bitso">bitso</option>
+        <option value="bitstamp">bitstamp</option>
+        <option value="bitstamp1">bitstamp1</option>
+        <option value="bittrex">bittrex</option>
+        <option value="bitvavo">bitvavo</option>
+        <option value="bkex">bkex</option>
+        <option value="bl3p">bl3p</option>
+        <option value="blockchaincom">blockchaincom</option>
+        <option value="btcalpha">btcalpha</option>
+        <option value="btcbox">btcbox</option>
+        <option value="btcmarkets">btcmarkets</option>
+        <option value="btctradeua">btctradeua</option>
+        <option value="btcturk">btcturk</option>
+        <option value="bybit">bybit</option>
+        <option value="cex">cex</option>
+        <option value="coinbase">coinbase</option>
+        <option value="coinbaseprime">coinbaseprime</option>
+        <option value="coinbasepro">coinbasepro</option>
+        <option value="coincheck">coincheck</option>
+        <option value="coinex">coinex</option>
+        <option value="coinfalcon">coinfalcon</option>
+        <option value="coinmate">coinmate</option>
+        <option value="coinone">coinone</option>
+        <option value="coinsph">coinsph</option>
+        <option value="coinspot">coinspot</option>
+        <option value="cryptocom">cryptocom</option>
+        <option value="currencycom">currencycom</option>
+        <option value="delta">delta</option>
+        <option value="deribit">deribit</option>
+        <option value="digifinex">digifinex</option>
+        <option value="exmo">exmo</option>
+        <option value="fmfwio">fmfwio</option>
+        <option value="gate">gate</option>
+        <option value="gateio">gateio</option>
+        <option value="gemini">gemini</option>
+        <option value="hitbtc">hitbtc</option>
+        <option value="hitbtc3">hitbtc3</option>
+        <option value="hollaex">hollaex</option>
+        <option value="huobi">huobi</option>
+        <option value="huobijp">huobijp</option>
+        <option value="huobipro">huobipro</option>
+        <option value="idex">idex</option>
+        <option value="independentreserve">independentreserve</option>
+        <option value="indodax">indodax</option>
+        <option value="kraken">kraken</option>
+        <option value="krakenfutures">krakenfutures</option>
+        <option value="kucoin">kucoin</option>
+        <option value="kucoinfutures">kucoinfutures</option>
+        <option value="kuna">kuna</option>
+        <option value="latoken">latoken</option>
+        <option value="lbank">lbank</option>
+        <option value="lbank2">lbank2</option>
+        <option value="luno">luno</option>
+        <option value="lykke">lykke</option>
+        <option value="mercado">mercado</option>
+        <option value="mexc">mexc</option>
+        <option value="mexc3">mexc3</option>
+        <option value="ndax">ndax</option>
+        <option value="novadax">novadax</option>
+        <option value="oceanex">oceanex</option>
+        <option value="okcoin">okcoin</option>
+        <option value="okex">okex</option>
+        <option value="okex5">okex5</option>
+        <option value="okx">okx</option>
+        <option value="paymium">paymium</option>
+        <option value="phemex">phemex</option>
+        <option value="poloniex">poloniex</option>
+        <option value="poloniexfutures">poloniexfutures</option>
+        <option value="probit">probit</option>
+        <option value="tidex">tidex</option>
+        <option value="timex">timex</option>
+        <option value="tokocrypto">tokocrypto</option>
+        <option value="upbit">upbit</option>
+        <option value="wavesexchange">wavesexchange</option>
+        <option value="wazirx">wazirx</option>
+        <option value="whitebit">whitebit</option>
+        <option value="woo">woo</option>
+        <option value="yobit">yobit</option>
+        <option value="zaif">zaif</option>
+        <option value="zonda">zonda</option> {% endcomment %}
+  </select>
+</div>
+<div>
+  <label for="id_currencies">currencies choice:</label>
+      <select name="currencies" id="id_currencies">
+      </select>
+</div>
+</form>
+
+{% if trading_view == "True" %}
+<!-- TradingView Widget BEGIN -->
+  <div class="tradingview-widget-container" disabled>
+      <div id="tradingview_40d3c"></div>
+      <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget(
+      {
+      "autosize": true,
+      "symbol": "{{ exchange|upper }}:{{ currencies|strip }}",
+      "timezone": "Etc/UTC",
+      "theme": "dark",
+      "style": "1",
+      "locale": "en",
+      "toolbar_bg": "#f1f3f6",
+      "enable_publishing": true,
+      "backgroundColor": "rgba(0, 0, 0, 1)",
+      "gridColor": "rgba(203, 203, 203, 0.06)",
+      "withdateranges": true,
+      "range": "1D",
+      "hide_side_toolbar": false,
+      "allow_symbol_change": true,
+      "details": true,
+      "hotlist": true,
+      "calendar": true,
+      "show_popup_button": true,
+      "popup_width": "1000",
+      "popup_height": "650",
+      "container_id": "tradingview_40d3c"
+    }
+      );
+      </script>
+    </div>
+  <!-- TradingView Widget END -->
+{% endif %}
+
+{% endblock content %}

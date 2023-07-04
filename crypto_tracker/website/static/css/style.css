@@ -188,3 +188,15 @@ label {
 .button:hover {
     background-color: #45a049;
 }
+
+/* chart style */
+main {
+    max-width: auto;
+    max-height: auto;
+    height: 100%;
+}
+
+#tradingview_40d3c {
+    width: 100%;
+    height: 100vh;
+}
