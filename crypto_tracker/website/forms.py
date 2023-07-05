@@ -11,4 +11,5 @@ class NewsSearchBar(forms.Form):
 class ChartForm(forms.Form):
     tradingview_button = forms.BooleanField(required=False)
     exchange = forms.ChoiceField(label=_('exchange choice'), choices=((ccxt.exchanges[i], ccxt.exchanges[i]) for i in range(len(ccxt.exchanges))), required=False)
-    
+    # exchange = forms.ChoiceField(choices=[])  # Change to ChoiceField
+    currencies = forms.ChoiceField(choices=[])
