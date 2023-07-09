@@ -14,7 +14,12 @@
             <ul class='navbar-wrapper'>
                 <li class='navbar-item'><a class="button" href={% url 'chart' %}>Chart</a></li>
                 <li class='navbar-item'><a class="button" href={% url 'news' %}>News</a></li>
-                <li class='navbar-item'><a></a></li>
+                {% if user.is_authenticated %}
+                    <li class='navbar-item'><a class="button" href={% url 'profile' %}>Profile</a></li>
+                    <li class='navbar-item'><a class="button" href={% url 'dashboard_list' %}>Dashboard</a></li>
+                {% else %}
+                    <li class='navbar-item'><a class="button" href={% url 'profile' %}>sign-in</a></li>
+                {% endif %}
             </ul>
         </div>
     </body>
