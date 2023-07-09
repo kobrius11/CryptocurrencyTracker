@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional, Type
+from django.forms.models import BaseModelForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpRequest, HttpResponse, request
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -15,6 +16,7 @@ from GoogleNews import GoogleNews
 # ccxt stuff (chart.html)
 import ccxt
 import pandas as pd
+
 
 # Create your views here.
 def index(request):
@@ -64,7 +66,7 @@ class Chart(generic.FormView):
         }
         return context
     
-
+# Dashboard.html views
 class DashboardListView(LoginRequiredMixin, generic.ListView):
     model = models.ApiContainer
     template_name = 'tracker_site/dashboard.html'
@@ -84,5 +86,20 @@ class DashboardDetailView(LoginRequiredMixin, generic.DetailView):
         context["apiobj"] = get_object_or_404(models.ApiContainer, id=self.kwargs['pk'])
         return context
     
+# 
+class DashboardCreateView(LoginRequiredMixin, generic.CreateView):
+    model = models.ApiContainer
+    form_class = f.modelform_factory(model, form=f.ModelForm, fields={
+        'exchange': f.ChoiceField(label=_('exchange'), choices=ccxt.exchanges),
+        'name': f.ChoiceField(label=_('exchange'), choices=ccxt.exchanges), 
+        'apikey': f.CharField(label=_('API')), 
+        'secret_key': f.PasswordInput(render_value=False)
+        })
+    template_name = 'tracker_site/dashboard_create.html'
+    success_url = reverse_lazy('dashboard_list')
 
-    
+    def form_valid(self, form):
+        form = super().get_form(self.form_class)
+        form.instance.user = self.request.user
+        form.save(False)
+        return super().form_valid(form)

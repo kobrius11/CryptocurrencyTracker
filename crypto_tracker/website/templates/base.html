@@ -17,6 +17,7 @@
                 {% if user.is_authenticated %}
                     <li class='navbar-item'><a class="button" href={% url 'profile' %}>Profile</a></li>
                     <li class='navbar-item'><a class="button" href={% url 'dashboard_list' %}>Dashboard</a></li>
+                    <li class='navbar-item'><a class="button" href={% url 'logout' %}>Logout</a></li>
                 {% else %}
                     <li class='navbar-item'><a class="button" href={% url 'profile' %}>sign-in</a></li>
                 {% endif %}

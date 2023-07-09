@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_protect
 from . forms import ProfileUpdateForm, UserUpdateForm
+from . import models
 # Create your views here.
 
 User =  get_user_model()
@@ -21,16 +22,16 @@ def profile(request, user_id=None):
 def profile_update(request):
     if request.method == "POST":
         user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
-        if user_form.is_valid() and profile_form.is_valid():
+        # profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        if user_form.is_valid():
             user_form.save()
-            profile_form.save()
+            # profile_form.save()
             messages.success(request, "Profile updated.")
             return redirect('profile')
     else:
         user_form = UserUpdateForm(instance=request.user)
-        profile_form = ProfileUpdateForm(instance=request.user.profile)
-    return render(request, 'user_profile/profile_update.html', {'user_form': user_form, 'profile_form': profile_form})
+        # profile_form = ProfileUpdateForm(instance=request.user.profile)
+    return render(request, 'profile/profile_update.html', {'user_form': user_form})
 
 @csrf_protect
 def signup(request):
@@ -63,6 +64,11 @@ def signup(request):
             )
             user.set_password(password)
             user.save()
+            profile = models.Profile.objects.create(
+                user=user,
+                picture=None,
+            )
+            profile.save()
             messages.success(request, "User registration successful!")
             return redirect('login')
     return render(request, 'registration/signup.html')
