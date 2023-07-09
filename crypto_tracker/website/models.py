@@ -1,20 +1,25 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from ccxt import exchanges
 
-# class NewsArticle(models.Model):
-#     title = models.CharField(_("title"), max_length=250)
-#     description = models.TextField(_("description"), null=True, blank=True)
-#     link = models.
-    
 
-#     class Meta:
-#         verbose_name = _("newsarticle")
-#         verbose_name_plural = _("newsarticles")
+class ApiContainer(models.Model):
+    exchange = models.CharField(_("exhcange"), choices=((exchange, exchange) for exchange in exchanges))
+    name = models.CharField(_("name"), max_length=250)
+    description = models.TextField(_("description"))
+    apikey = models.CharField(_("apikey"), max_length=250)
+    secret_key = models.CharField(_("secret key"), max_length=250)
+    user = models.OneToOneField(get_user_model(), verbose_name=_("user"), on_delete=models.CASCADE)
 
-#     def __str__(self):
-#         return self.name
+    class Meta:
+        verbose_name = _("Api container")
+        verbose_name_plural = _("Api containers")
 
-#     def get_absolute_url(self):
-#         return reverse("newsarticle_detail", kwargs={"pk": self.pk})
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("apicontainer_detail", kwargs={"pk": self.pk})

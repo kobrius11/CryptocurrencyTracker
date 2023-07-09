@@ -1,11 +1,13 @@
 from typing import Any, Dict
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpRequest, HttpResponse, request
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic
 from django import forms as f
 from django.utils.translation import gettext_lazy as _
 from . import forms
+from . import models
 
 #news stuff (news.html)
 from GoogleNews import GoogleNews
@@ -36,48 +38,16 @@ def news(request):
     return render(request, 'tracker_site/news.html', context=context)
 
 
-def chart(request):
-    form = forms.ChartForm()
-    
-    # trading view open/close button
-    trading_view = request.GET.get('tradingview_button')
-
-
-    exchange = request.GET.get('exchange')
-    exchange_currencies = request.GET.get('currencies')
-    exchange_instance = getattr(ccxt, exchange)()
-    exchange_instance.load_markets()
-
-
-    
-    context = {
-        "exchange": exchange,
-        "currencies": exchange_currencies,
-        "trading_view": trading_view,
-        "form": form
-    }
-    
-    print(exchange_instance)
-    return render(request, 'tracker_site/chart.html', context)
-
 class Chart(generic.FormView):
     form_class = forms.ChartForm()
     template_name = 'tracker_site/chart.html'
     success_url = reverse_lazy('chart')
 
-    def form_valid(self, form=form_class):
-        data = {
-            "exchange": self.request.GET.get('exchange'),
-            "currencies": self.request.GET.get('currencies'),
-            # "trading_view": self.request.GET.get('tradingview_button'),
-        }
-        # Perform any necessary actions with the saved exchange, currencies, and trading_view values
-        return data
-
 
     def get_form(self, form=form_class):
-        # form = super().get_form(form)
+        #form = super().get_form(self.form_class)
         exchange_string = self.request.GET.get('exchange')
+        print(exchange_string)
         if exchange_string:
             exchange_instance = getattr(ccxt, exchange_string)()
             exchange_instance.load_markets()
@@ -86,20 +56,32 @@ class Chart(generic.FormView):
 
     def get_context_data(self, **kwargs: Any):
         context =  super().get_context_data(**kwargs)
-        if self.form_valid():
-            context = {
-                "exchange": self.form_valid()['exchange'],
-                "currencies": self.form_valid()['currencies'],
-                "trading_view": self.request.GET.get('tradingview_button'),
-                "form": self.form_class
-            }
-            return context
         context = {
             "exchange": self.request.GET.get('exchange'),
             "currencies": self.request.GET.get('currencies'),
             "trading_view": self.request.GET.get('tradingview_button'),
             "form": self.form_class
         }
+        return context
+    
+
+class DashboardListView(LoginRequiredMixin, generic.ListView):
+    model = models.ApiContainer()
+    template_name = 'tracker_site/dashboard.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(user=self.request.user)
+        return qs
+    
+
+class DashboardDetailView(LoginRequiredMixin, generic.DetailView):
+    model = models.ApiContainer()
+    template_name = 'tracker_site/dashboard_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["apiobj"] = get_object_or_404(models.ApiContainer, id=self.kwargs['pk'])
         return context
     
 

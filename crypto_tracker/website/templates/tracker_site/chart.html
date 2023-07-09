@@ -12,13 +12,14 @@
     {{ form.currencies.label_tag }}
     {{ form.currencies }}
   </div>
-  {% comment %} {% if form.exchange.value and form.currencies.value %} {% endcomment %}
+  <button class="button-secondary" type="submit">GO!</button>
+  {% if form.exchange.value %}
     {% if trading_view == "True" %}
       <button class="button-secondary" name="tradingview_button" value=False type="submit">Close Trading view</button>
     {% else %}
       <button class="button-secondary" name="tradingview_button" value=True type="submit">Open Trading view</button>
     {% endif %}
-  {% comment %} {% endif %} {% endcomment %}
+  {% endif %}
 </form>
 
 {% if trading_view == "True" %}
