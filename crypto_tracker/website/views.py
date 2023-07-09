@@ -66,7 +66,7 @@ class Chart(generic.FormView):
     
 
 class DashboardListView(LoginRequiredMixin, generic.ListView):
-    model = models.ApiContainer()
+    model = models.ApiContainer
     template_name = 'tracker_site/dashboard.html'
 
     def get_queryset(self):
@@ -76,7 +76,7 @@ class DashboardListView(LoginRequiredMixin, generic.ListView):
     
 
 class DashboardDetailView(LoginRequiredMixin, generic.DetailView):
-    model = models.ApiContainer()
+    model = models.ApiContainer
     template_name = 'tracker_site/dashboard_detail.html'
 
     def get_context_data(self, **kwargs):
