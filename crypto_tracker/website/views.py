@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from . import forms
 from . import models
 
-from crypto_tracker import encryption_config
+from crypto_tracker.local_settings import KEY_INSTANCE
 from cryptography.fernet import Fernet
 
 #news stuff (news.html)
@@ -21,8 +21,8 @@ from GoogleNews import GoogleNews
 import ccxt
 import pandas as pd
 
-GENERATED_KEY = Fernet.generate_key()
-CRYPTOGRAPHIC_KEY = Fernet(GENERATED_KEY)
+
+CRYPTOGRAPHIC_KEY = Fernet(KEY_INSTANCE)
 
 # Create your views here.
 def index(request):
