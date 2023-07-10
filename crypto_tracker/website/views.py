@@ -3,6 +3,7 @@ from django.forms.models import BaseModelForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpRequest, HttpResponse, request
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.hashers import make_password
 from django.urls import reverse_lazy
 from django.views import generic
 from django import forms as f
@@ -10,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from . import forms
 from . import models
 
+from crypto_tracker import local_settings
 #news stuff (news.html)
 from GoogleNews import GoogleNews
 
@@ -89,17 +91,27 @@ class DashboardDetailView(LoginRequiredMixin, generic.DetailView):
 # 
 class DashboardCreateView(LoginRequiredMixin, generic.CreateView):
     model = models.ApiContainer
-    form_class = f.modelform_factory(model, form=f.ModelForm, fields={
-        'exchange': f.ChoiceField(label=_('exchange'), choices=ccxt.exchanges),
-        'name': f.ChoiceField(label=_('exchange'), choices=ccxt.exchanges), 
-        'apikey': f.CharField(label=_('API')), 
-        'secret_key': f.PasswordInput(render_value=False)
-        })
+    form_class = forms.ApiContainerCreateForm 
+    #f.modelform_factory(model, form=f.ModelForm, fields={
+    #     'exchange': f.ChoiceField(label=_('exchange'), choices=ccxt.exchanges),
+    #     'name': f.ChoiceField(label=_('exchange'), choices=ccxt.exchanges), 
+    #     'apikey': f.CharField(label=_('API')), 
+    #     'secret_key': f.PasswordInput()
+    #     })
     template_name = 'tracker_site/dashboard_create.html'
     success_url = reverse_lazy('dashboard_list')
 
     def form_valid(self, form):
         form = super().get_form(self.form_class)
+        form.save(False)
         form.instance.user = self.request.user
         form.save(False)
+        form.instance.secret_key = make_password(form.cleaned_data['secret_key'], salt=local_settings.HASHING_SALT)[33:]
+        form.save(False)
+        # hashed_secret_key = make_password(form.cleaned_data['secret_key'], salt='BilasAsDe')
+        # self.model.objects.create(exchange=form.cleaned_data['exchange'],
+        # name=form.cleaned_data['name'],
+        # apikey=form.cleaned_data['apikey'],
+        # secret_key=hashed_secret_key,
+        # user=self.request.user)
         return super().form_valid(form)

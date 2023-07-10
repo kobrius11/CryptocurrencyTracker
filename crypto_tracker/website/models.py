@@ -12,7 +12,7 @@ class ApiContainer(models.Model):
     description = models.TextField(_("description"))
     apikey = models.CharField(_("apikey"), max_length=250)
     secret_key = models.CharField(_("secret key"), max_length=250)
-    user = models.ForeignKey(get_user_model(), verbose_name=_("user"), on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), verbose_name=_("user"), on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = _("Api container")

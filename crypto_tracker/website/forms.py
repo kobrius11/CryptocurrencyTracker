@@ -14,11 +14,12 @@ class ChartForm(forms.Form):
     exchange = forms.ChoiceField(label=_('exchange choice'), choices=((ccxt.exchanges[i], ccxt.exchanges[i]) for i in range(len(ccxt.exchanges))), required=False)
 
 
-class CreateModelForm(forms.ModelForm):
+class ApiContainerCreateForm(forms.ModelForm):
 
     class Meta:
-        model = None
-        fields = []
+        model = models.ApiContainer
+        fields = ['exchange', 'name', 'apikey', 'secret_key', 'user']
         widgets = {
-
+            'user': forms.HiddenInput(),
+            'secret_key': forms.PasswordInput()
         }
