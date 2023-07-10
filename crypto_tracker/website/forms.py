@@ -16,10 +16,10 @@ class ChartForm(forms.Form):
 
 class ApiContainerCreateForm(forms.ModelForm):
 
+    secret_key_text = forms.CharField(label=_('secret key'), widget=forms.PasswordInput())
     class Meta:
         model = models.ApiContainer
-        fields = ['exchange', 'name', 'apikey', 'secret_key', 'user']
+        fields = ['exchange', 'name', 'apikey', 'secret_key_text', 'user']
         widgets = {
             'user': forms.HiddenInput(),
-            'secret_key': forms.PasswordInput()
         }

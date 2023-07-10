@@ -11,7 +11,7 @@ class ApiContainer(models.Model):
     name = models.CharField(_("name"), max_length=250)
     description = models.TextField(_("description"))
     apikey = models.CharField(_("apikey"), max_length=250)
-    secret_key = models.CharField(_("secret key"), max_length=250)
+    secret_key = models.BinaryField(_("secret key"), null=True, blank=True)
     user = models.ForeignKey(get_user_model(), verbose_name=_("user"), on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:

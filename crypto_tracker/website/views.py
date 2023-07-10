@@ -11,7 +11,9 @@ from django.utils.translation import gettext_lazy as _
 from . import forms
 from . import models
 
-from crypto_tracker import local_settings
+from crypto_tracker import encryption_config
+from cryptography.fernet import Fernet
+
 #news stuff (news.html)
 from GoogleNews import GoogleNews
 
@@ -19,6 +21,8 @@ from GoogleNews import GoogleNews
 import ccxt
 import pandas as pd
 
+GENERATED_KEY = Fernet.generate_key()
+CRYPTOGRAPHIC_KEY = Fernet(GENERATED_KEY)
 
 # Create your views here.
 def index(request):
@@ -46,7 +50,6 @@ class Chart(generic.FormView):
     form_class = forms.ChartForm()
     template_name = 'tracker_site/chart.html'
     success_url = reverse_lazy('chart')
-
 
     def get_form(self, form=form_class):
         #form = super().get_form(self.form_class)
@@ -85,10 +88,18 @@ class DashboardDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["apiobj"] = get_object_or_404(models.ApiContainer, id=self.kwargs['pk'])
+        obj = get_object_or_404(models.ApiContainer, id=self.kwargs['pk'])
+        print(bytes(obj.secret_key))
+        print(obj.secret_key)
+        print(obj.secret_key)
+        context["api_obj"] = obj
+        context["ccxt_obj"] = getattr(ccxt, obj.exchange)(config={
+            'apiKey': obj.apikey,
+            'secret': CRYPTOGRAPHIC_KEY.decrypt(bytes(obj.secret_key)),
+        })
         return context
     
-# 
+
 class DashboardCreateView(LoginRequiredMixin, generic.CreateView):
     model = models.ApiContainer
     form_class = forms.ApiContainerCreateForm 
@@ -103,15 +114,10 @@ class DashboardCreateView(LoginRequiredMixin, generic.CreateView):
 
     def form_valid(self, form):
         form = super().get_form(self.form_class)
-        form.save(False)
         form.instance.user = self.request.user
         form.save(False)
-        form.instance.secret_key = make_password(form.cleaned_data['secret_key'], salt=local_settings.HASHING_SALT)[33:]
+        result = bytes(form.cleaned_data['secret_key_text'], encoding='utf-8')
+        form.instance.secret_key = CRYPTOGRAPHIC_KEY.encrypt(result) 
+        # form.instance.secret_key = make_password(form.cleaned_data['secret_key'], salt=local_settings.HASHING_SALT)[33:]
         form.save(False)
-        # hashed_secret_key = make_password(form.cleaned_data['secret_key'], salt='BilasAsDe')
-        # self.model.objects.create(exchange=form.cleaned_data['exchange'],
-        # name=form.cleaned_data['name'],
-        # apikey=form.cleaned_data['apikey'],
-        # secret_key=hashed_secret_key,
-        # user=self.request.user)
         return super().form_valid(form)

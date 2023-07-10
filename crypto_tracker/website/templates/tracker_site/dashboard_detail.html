@@ -3,13 +3,18 @@
 
 <div class='menu'>
     <ul class='menu-wrapper'>
-        <li class='menu-item'><a class="menu-button" href={% url '??' %}>Edit Container</a></li>
-        <li class='menu-item'><a class="menu-button" href={% url '??' %}></a>Delete Container</li>
+        {% comment %} <li class='menu-item'><a class="menu-button" href={% url '??' %}>Edit Container</a></li>
+        <li class='menu-item'><a class="menu-button" href={% url '??' %}></a>Delete Container</li> {% endcomment %}
         
     </ul>
 </div>
 
-
+{% if api_obj %}
+    <p>hello world!</p>
+{% endif %}
+{% if ccxt_obj %}
+    <p>{% ccxt_obj.fetch_ohlcv('BTCUSDT', limit=1000) %}</p>
+{% endif %}
 
 {% endblock content %}
 

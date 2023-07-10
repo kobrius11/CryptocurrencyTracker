@@ -7,12 +7,19 @@
         <li class='menu-item'><a class="menu-button" href={% url 'dashboard_create' %}>Create new Container</a></li>
     </ul>
 </div>
-
-{% if apicontainer_list %}
-    {% for container in apicontainer_list %}
-        <li><a href={% url 'dashboard_detail' container.pk %}>{{ container.name }}</li>
-    {% endfor %}
-{% endif %}
-
+<ul class="articles-wrapper">
+    {% if apicontainer_list %}
+        {% for container in apicontainer_list %}
+            <li class="article-container">
+                <a href={% url 'dashboard_detail' container.pk %}>{{ container.name }}</a>
+                <p>{{ container.exchange }}</p>
+                <p>{{ container.apikey }}</p>
+                <p>{{ container.description }}</p>
+            </li>
+        {% endfor %}
+    {% else %}
+        <p>:/</p>
+    {% endif %}
+</ul>
 
 {% endblock content %}
