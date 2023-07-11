@@ -2,27 +2,130 @@
 
 {% block content %}
 
+{% comment %} // Log the URL string.
+console.log(url.href);
+
+// Go to the URL.
+location.assign(url);
+
+// Go to the URL, but overwrite this history entry.
+location.replace(url);
+
+// Same as `location.assign` without reloading.
+history.pushState(null, '', url);
+
+// Same as `location.replace` without reloading.
+history.replaceState(null, '', url); {% endcomment %}
+
+
 <form enctype="multipart/form-data" method="get">
+  
   {% csrf_token %}
   <div>
     {{ form.exchange.label_tag }}
     {{ form.exchange }}
   </div>
   <div>
-    {{ form.currencies.label_tag }}
-    {{ form.currencies }}
+    <label for="id_exchange">Exchange:</label>
+    <select name="exchange" id="id_exchange">
+    {% for exchange in exchanges %}
+      <option value={{ exchange }}>{{ exchange }}</option>
+    {% endfor %}</select>
+  </div>
+
+  <div id="currenciesField">
+    <label for="id_currencies">Currency:</label>
+    <select id="id_currencies" name="currencies">
+    {% for market in markets_list %}
+      <option value={{ market }}>{{ market }}</option>
+    {% endfor %}</select>
   </div>
   <button class="button-secondary" type="submit">GO!</button>
-  {% if form.exchange.value %}
-    {% if trading_view == "True" %}
-      <button class="button-secondary" name="tradingview_button" value=False type="submit">Close Trading view</button>
+  {% if request.GET.tradingview_button == "True" %}
+      <a href='#' class="button-secondary" name="tradingview_button" onclick="tradingView(true)">Close Trading view</a>
     {% else %}
-      <button class="button-secondary" name="tradingview_button" value=True type="submit">Open Trading view</button>
-    {% endif %}
+      <a href='#' class="button-secondary" name="tradingview_button" onclick="tradingView(false)">Open Trading view</a>
+    
   {% endif %}
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    function updateExchangeURLParam(exchangeValue) {
+      var url = new URL(window.location.href);
+      url.searchParams.set('exchange', exchangeValue);
+      history.replaceState(null, null, url.toString());
+    }
+
+    $(document).ready(function() {
+      var exchangeValue = "{{ request.GET.exchange }}";
+      $("#chartForm").on("submit", function() {
+        $("#id_exchange").find("option[value='" + exchangeValue + "']").prop("selected", true); // Set exchange value to empty
+        $("#id_currencies").val("");
+        
+      });
+  
+      $("#id_exchange").on("change", function() {
+        var selectedValue = $(this).val();
+        if (selectedValue) {
+          updateExchangeURLParam(selectedValue);
+          $("#chartForm").submit();
+          location.reload();
+        }
+      });
+      $("#id_exchange").find("option[value='" + exchangeValue + "']").prop("selected", true);
+    });
+
+    function generateUrl(url, params) {
+      var i = 0, key;
+      for (key in params) {
+          if (i === 0) {
+              url += "?";
+          } else {
+              url += "&";
+          }
+          url += key;
+          url += '=';
+          url += params[key];
+          i++;
+      }
+      return url;
+  }
+
+    function tradingView(arg) {
+      let params = new URLSearchParams(document.location.search);
+      var newLocation = "http://localhost/chart/";
+      var csrfmiddlewaretoken = params.get('csrfmiddlewaretoken');
+      var tradingViewVar = "{{ trading_view|escapejs }}";
+      var exchange = params.get('exchange');
+      var currencies = params.get('currencies');
+      if (arg) {
+        tradingViewVar = "False"
+        newLocation = generateUrl("http://localhost/chart/",{ 
+          csrfmiddlewaretoken: csrfmiddlewaretoken,
+          exchange: exchange,
+          currencies: currencies,
+          tradingview_button: tradingViewVar,
+      })
+      } else {
+        tradingViewVar = "True"
+        newLocation = generateUrl("http://localhost/chart/",{ 
+          csrfmiddlewaretoken: csrfmiddlewaretoken,
+          exchange: exchange,
+          currencies: currencies,
+          tradingview_button: tradingViewVar,
+      })
+      
+      } 
+      window.location.href = newLocation;
+    }
+
+  </script>
 </form>
 
-{% if trading_view == "True" %}
+
+
+{% if request.GET.tradingview_button == "True" %}
 <!-- TradingView Widget BEGIN -->
   <div class="tradingview-widget-container" disabled>
       <div id="tradingview_40d3c"></div>
@@ -32,7 +135,7 @@
       new TradingView.widget(
       {
       "autosize": true,
-      "symbol": "{{ exchange|upper }}:{{ currencies|cut:'/' }}",
+      "symbol": "{{ exchange|upper }}:{{ request.GET.currencies|cut:'/' }}",
       "timezone": "Etc/UTC",
       "theme": "dark",
       "style": "1",

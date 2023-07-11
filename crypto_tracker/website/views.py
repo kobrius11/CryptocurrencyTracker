@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional, Type
 from django.forms.models import BaseModelForm
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpRequest, HttpResponse, request
+from django.http import HttpRequest, HttpResponse, request, JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
 from django.urls import reverse_lazy
@@ -28,6 +28,22 @@ CRYPTOGRAPHIC_KEY = Fernet(KEY_INSTANCE)
 def index(request):
     return render(request, 'tracker_site/index.html')
 
+def get_currencies(request):
+    selected_exchange = request.GET.get('exchange')
+
+    if selected_exchange:
+        try:
+            exchange_instance = getattr(ccxt, selected_exchange)()
+            exchange_instance.load_markets()
+            currencies = {
+                'currencies': exchange_instance.symbols
+            }
+            print(exchange_instance.symbols)
+            return JsonResponse(currencies)
+        except AttributeError:
+            pass
+
+    return JsonResponse({'currencies': []})
 
 def news(request):
     form = forms.NewsSearchBar()
@@ -46,30 +62,24 @@ def news(request):
     return render(request, 'tracker_site/news.html', context=context)
 
 
-class Chart(generic.FormView):
-    form_class = forms.ChartForm()
+class Chart(generic.TemplateView):
+    model = models.ExchangeModel
+    # form_class = forms.ChartForm()
     template_name = 'tracker_site/chart.html'
     success_url = reverse_lazy('chart')
 
-    def get_form(self, form=form_class):
-        #form = super().get_form(self.form_class)
-        exchange_string = self.request.GET.get('exchange')
-        print(exchange_string)
-        if exchange_string:
-            exchange_instance = getattr(ccxt, exchange_string)()
-            exchange_instance.load_markets()
-            form.fields['currencies'] = f.ChoiceField(label=_('currency'), choices=((symbol, symbol) for symbol in exchange_instance.symbols))
-        return form
-
     def get_context_data(self, **kwargs: Any):
         context =  super().get_context_data(**kwargs)
+        obj = get_object_or_404(models.ExchangeModel, exchange=self.request.GET.get('exchange'))
         context = {
+            "exchanges": self.model.objects.all(),
             "exchange": self.request.GET.get('exchange'),
-            "currencies": self.request.GET.get('currencies'),
-            "trading_view": self.request.GET.get('tradingview_button'),
-            "form": self.form_class
+            "markets_list": obj.exchange_markets,
+            "tradingview_button": "False",
+            
         }
         return context
+    
     
 # Dashboard.html views
 class DashboardListView(LoginRequiredMixin, generic.ListView):
