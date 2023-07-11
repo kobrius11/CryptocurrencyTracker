@@ -20,11 +20,7 @@ history.replaceState(null, '', url); {% endcomment %}
 
 <form enctype="multipart/form-data" method="get">
   
-  {% csrf_token %}
-  <div>
-    {{ form.exchange.label_tag }}
-    {{ form.exchange }}
-  </div>
+  {% comment %} {% csrf_token %} {% endcomment %}
   <div>
     <label for="id_exchange">Exchange:</label>
     <select name="exchange" id="id_exchange">
@@ -51,14 +47,15 @@ history.replaceState(null, '', url); {% endcomment %}
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    function updateExchangeURLParam(exchangeValue) {
+    function updateURLParam(param, Value) {
       var url = new URL(window.location.href);
-      url.searchParams.set('exchange', exchangeValue);
+      url.searchParams.set(param, Value);
       history.replaceState(null, null, url.toString());
     }
 
     $(document).ready(function() {
       var exchangeValue = "{{ request.GET.exchange }}";
+      var currenciesValue = "{{ request.GET.currencies }}"
       $("#chartForm").on("submit", function() {
         $("#id_exchange").find("option[value='" + exchangeValue + "']").prop("selected", true); // Set exchange value to empty
         $("#id_currencies").val("");
@@ -66,14 +63,25 @@ history.replaceState(null, '', url); {% endcomment %}
       });
   
       $("#id_exchange").on("change", function() {
-        var selectedValue = $(this).val();
-        if (selectedValue) {
-          updateExchangeURLParam(selectedValue);
+        var selectedExchange = $(this).val();
+        if (selectedExchange) {
+          updateURLParam('exchange', selectedExchange);
           $("#chartForm").submit();
           location.reload();
         }
       });
+
+      $("#id_currencies").on("change", function() {
+        var selectedCurrencies = $(this).val();
+        if (selectedCurrencies) {
+          updateURLParam('currencies', selectedCurrencies);
+          $("#chartForm").submit();
+          location.reload();
+        }
+      });
+
       $("#id_exchange").find("option[value='" + exchangeValue + "']").prop("selected", true);
+      $("#id_currencies").find("option[value='" + currenciesValue + "']").prop("selected", true);
     });
 
     function generateUrl(url, params) {

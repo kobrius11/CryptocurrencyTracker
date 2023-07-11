@@ -70,12 +70,17 @@ class Chart(generic.TemplateView):
 
     def get_context_data(self, **kwargs: Any):
         context =  super().get_context_data(**kwargs)
-        obj = get_object_or_404(models.ExchangeModel, exchange=self.request.GET.get('exchange'))
+        try:
+            obj = get_object_or_404(models.ExchangeModel, exchange=self.request.GET.get('exchange'))
+        except:
+            obj = get_object_or_404(models.ExchangeModel, exchange='ace')
+
+        
         context = {
             "exchanges": self.model.objects.all(),
             "exchange": self.request.GET.get('exchange'),
-            "markets_list": obj.exchange_markets,
             "tradingview_button": "False",
+            'markets_list': obj.exchange_markets
             
         }
         return context
