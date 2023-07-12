@@ -1,23 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-{% comment %} // Log the URL string.
-console.log(url.href);
-
-// Go to the URL.
-location.assign(url);
-
-// Go to the URL, but overwrite this history entry.
-location.replace(url);
-
-// Same as `location.assign` without reloading.
-history.pushState(null, '', url);
-
-// Same as `location.replace` without reloading.
-history.replaceState(null, '', url); {% endcomment %}
-
-
 <form enctype="multipart/form-data" method="get">
   
   {% comment %} {% csrf_token %} {% endcomment %}
