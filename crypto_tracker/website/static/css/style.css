@@ -27,17 +27,17 @@ select {
 
 select:focus {
     outline: none;
-    border-color: #45a049;
+    border-color: #010101;
 }
 
 select option {
     /* Add styles for the options */
     background-color: #f1f1f1;
-    color: #333;
+    color: #191717;
 }
 
 select option:hover {
-    background-color: #ddd;
+    background-color: #c2c0c0;
 }
 
 html {

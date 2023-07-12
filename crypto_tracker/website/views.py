@@ -21,12 +21,71 @@ from GoogleNews import GoogleNews
 import ccxt
 import pandas as pd
 
+def get_price_change(period=604800000, exchange=ccxt.binance(), symbol='BTCUSDT'):
+    # hour=3600000, day=86400000, week=604800000, month(30days)=2592000000, year=31536000000
+    current_price = exchange.fetch_ohlcv(symbol, limit=2)[0]
+    period_price = exchange.fetch_ohlcv(symbol, since=current_price[0] - period, limit=1)[0]
+    result = current_price[4] / (period_price[4] / 100)
+    return f"{(result - 100):.2f}"
+
 
 CRYPTOGRAPHIC_KEY = Fernet(KEY_INSTANCE)
 
 # Create your views here.
 def index(request):
-    return render(request, 'tracker_site/index.html')
+    # get latest news
+    search_terms = ['Crypto', 'Stocks', 'Forex', 'Futures', 'Indices', 'Bonds']
+    articles = []
+
+    for term in search_terms:
+        news_class = GoogleNews()
+        news_class.get_news(term)
+        article = news_class.results(sort=False)[0]
+        articles.append(article)
+
+    # get price data (last closed price)
+    exchange = ccxt.binance()
+    BTCUSDT = exchange.fetch_ohlcv('BTCUSDT', limit=2)[0] # BITCOIN / USDT
+    ETHUSDT = exchange.fetch_ohlcv('ETHUSDT', limit=2)[0] # ETHERIUM / USDT
+    BUSDUSDT = exchange.fetch_ohlcv('BUSDUSDT', limit=2)[0] # USDOLLAR / USDT
+    BNBUSDT = exchange.fetch_ohlcv('BNBUSDT', limit=2)[0] # BINANCECOIN / USDT
+    USDCUSDT = exchange.fetch_ohlcv('USDCUSDT', limit=2)[0] # USDCOIN / USDT
+
+    context = {
+        'articles': articles,
+        'BTCUSDT': {'current': BTCUSDT[4], 
+                    '1h': get_price_change(period=3600000),
+                    '24h': get_price_change(period=86400000),
+                    '7d': get_price_change(period=604800000),
+                    '30d': get_price_change(period=2592000000),
+                    '365d': get_price_change(period=31536000000)},
+        'ETHUSDT': {'current': ETHUSDT[4], 
+                    '1h': get_price_change(period=3600000, symbol='ETHUSDT'),
+                    '24h': get_price_change(period=86400000, symbol='ETHUSDT'),
+                    '7d': get_price_change(period=604800000, symbol='ETHUSDT'),
+                    '30d': get_price_change(period=2592000000, symbol='ETHUSDT'),
+                    '365d': get_price_change(period=31536000000, symbol='ETHUSDT')},
+        'BUSDUSDT': {'current': BUSDUSDT[4], 
+                    '1h': get_price_change(period=3600000, symbol='BUSDUSDT'),
+                    '24h': get_price_change(period=86400000, symbol='BUSDUSDT'),
+                    '7d': get_price_change(period=604800000, symbol='BUSDUSDT'),
+                    '30d': get_price_change(period=2592000000, symbol='BUSDUSDT'),
+                    '365d': get_price_change(period=31536000000, symbol='BUSDUSDT')},
+        'BNBUSDT': {'current': BNBUSDT[4], 
+                    '1h': get_price_change(period=3600000, symbol='BNBUSDT'),
+                    '24h': get_price_change(period=86400000, symbol='BNBUSDT'),
+                    '7d': get_price_change(period=604800000, symbol='BNBUSDT'),
+                    '30d': get_price_change(period=2592000000, symbol='BNBUSDT'),
+                    '365d': get_price_change(period=31536000000, symbol='BNBUSDT')},
+        'USDCUSDT': {'current': USDCUSDT[4], 
+                    '1h': get_price_change(period=3600000, symbol='USDCUSDT'),
+                    '24h': get_price_change(period=86400000, symbol='USDCUSDT'),
+                    '7d': get_price_change(period=604800000, symbol='USDCUSDT'),
+                    '30d': get_price_change(period=2592000000, symbol='USDCUSDT'),
+                    '365d': get_price_change(period=31536000000, symbol='USDCUSDT')},
+    }
+
+    return render(request, 'tracker_site/index.html', context)
 
 def get_currencies(request):
     selected_exchange = request.GET.get('exchange')
