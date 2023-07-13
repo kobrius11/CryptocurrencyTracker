@@ -2,8 +2,10 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.utils.safestring import mark_safe
 import ccxt
 from .functions import get_price_change
+from celery import shared_task
 
 
 class ApiContainer(models.Model):
@@ -38,7 +40,14 @@ class ExchangeModel(models.Model):
         return self.exchange_instance.load_markets()
     
     def get_price_change(self, period, symbol):
-        return get_price_change(period=period, exchange=self.exchange_instance, symbol=symbol)
+        try:
+            price = get_price_change(period=period, exchange=self.exchange_instance, symbol=symbol)
+        except Exception as e:
+            return f"get_price_change: {e}"
+        if price.find('-'):
+            return mark_safe(f"<p style='color: green'>{price}</p>")
+        else:
+            return mark_safe(f"<p style='color: red'>{price}</p>")
     
     @property
     def get_markets_with_period_prices(self):
@@ -58,7 +67,7 @@ class ExchangeModel(models.Model):
     def get_info(self):
         return self.exchange_instance.describe
     
-
+    @shared_task(bind=True)
     def fetch_ohlcv(self, get, symbol, timeframe='1m', since=None, limit=None, params={}):
         all_symbol_current_prices = {}
 
@@ -66,8 +75,7 @@ class ExchangeModel(models.Model):
         try:
             result_instance = self.exchange_instance.fetch_ohlcv(symbol=symbol, timeframe=timeframe, since=since, limit=limit, params=params)[0]
         except Exception as e:
-            print(e)
-        print(result_instance)
+            return f"fetch_ohlcv: {e}"
         all_symbol_current_prices[symbol] = {
             'timestamp': result_instance[0],
             'open': result_instance[1],

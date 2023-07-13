@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from . import forms
 from . import models
 from .functions import get_price_change, sort_time, CRYPTOGRAPHIC_KEY
+from .tasks import test_func
 
 #news stuff (news.html)
 from GoogleNews import GoogleNews

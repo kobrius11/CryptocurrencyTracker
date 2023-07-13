@@ -42,3 +42,31 @@ services:
     volumes:
       - ./crypto_tracker/media:/app/media
       - ./crypto_tracker/static:/app/static
+
+  # redis:
+  #   container_name: redis
+  #   image: "redis:alpine"
+  
+  # celery:
+  #   build: 
+  #     context: ./crypto_tracker
+  #   command: celery -A core worker -l info
+  #   volumes:
+  #     - ./crypto_tracker:/app
+  #   env_file:
+  #     - ./.env
+  #   depends_on:
+  #     - crypto_tracker
+  #     - redis
+  
+  # celery-beat:
+  #   build: 
+  #     context: ./crypto_tracker
+  #   command: celery -A core beat -l info
+  #   volumes:
+  #     - ./crypto_tracker:/app
+  #   env_file:
+  #     - ./.env
+  #   depends_on:
+  #     - crypto_tracker
+  #     - redis

@@ -1,5 +1,6 @@
 import ccxt
 import pandas as pd
+from celery import shared_task
 
 from crypto_tracker.local_settings import KEY_INSTANCE
 from cryptography.fernet import Fernet
@@ -7,6 +8,7 @@ from cryptography.fernet import Fernet
 
 CRYPTOGRAPHIC_KEY = Fernet(KEY_INSTANCE)
 
+@shared_task(bind=True)
 def get_price_change(period=604800000, exchange=ccxt.binance(), symbol='BTCUSDT'):
     # hour=3600000, day=86400000, week=604800000, month(30days)=2592000000, year=31536000000
     current_price = exchange.fetch_ohlcv(symbol, limit=2)[0]

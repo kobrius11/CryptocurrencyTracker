@@ -86,14 +86,14 @@
     function tradingView(arg) {
       let params = new URLSearchParams(document.location.search);
       var newLocation = "http://localhost/chart/";
-      var csrfmiddlewaretoken = params.get('csrfmiddlewaretoken');
+      // var csrfmiddlewaretoken = params.get('csrfmiddlewaretoken');
       var tradingViewVar = "{{ trading_view|escapejs }}";
       var exchange = params.get('exchange');
       var currencies = params.get('currencies');
       if (arg) {
         tradingViewVar = "False"
         newLocation = generateUrl("http://localhost/chart/",{ 
-          csrfmiddlewaretoken: csrfmiddlewaretoken,
+          // csrfmiddlewaretoken: csrfmiddlewaretoken,
           exchange: exchange,
           currencies: currencies,
           tradingview_button: tradingViewVar,
@@ -101,7 +101,7 @@
       } else {
         tradingViewVar = "True"
         newLocation = generateUrl("http://localhost/chart/",{ 
-          csrfmiddlewaretoken: csrfmiddlewaretoken,
+          // csrfmiddlewaretoken: csrfmiddlewaretoken,
           exchange: exchange,
           currencies: currencies,
           tradingview_button: tradingViewVar,

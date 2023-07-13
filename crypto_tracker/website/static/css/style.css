@@ -505,6 +505,10 @@ main {
 
 .exchange-detail-markets-wrapper {
     margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .exchange-detail-markets-container {
