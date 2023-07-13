@@ -431,3 +431,99 @@ main {
 .menu-button.login:hover {
     text-decoration: underline;
 }
+
+
+/* exchange style */
+.exchanges-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    list-style: none;
+    gap: 20px;
+    padding-inline-start: 0;
+}
+
+.exchanges-container {
+    display: flex;
+    flex-direction: column;
+    border: 3px solid #434d57;
+    border-radius: 10px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 154px;
+    height: 99px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    background-color: transparent;
+}
+
+.exchange-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}
+
+.exchange-button img {
+    margin-top: 10px;
+}
+  
+.exchanges-container:hover {
+    border-color: rgba(0, 0, 0, 0.953);
+    background-color: rgba(49, 65, 96, 0.04);
+}
+
+/* exchange detail style */
+.exchange-detail-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 50px;
+}
+
+.exchange-detail-container {
+    text-align: center;
+}
+
+.exchange-detail-container img {
+    width: 150px;
+    height: 150px;
+}
+
+.exchange-detail-container h2 {
+    margin-top: 10px;
+}
+
+.exchange-detail-container a {
+    display: block;
+    margin-top: 10px;
+}
+
+.exchange-detail-markets-wrapper {
+    margin-top: 50px;
+}
+
+.exchange-detail-markets-container {
+    list-style-type: none;
+    padding: 0;
+}
+
+.exchange-detail-markets-item-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.exchange-detail-markets-item-container p {
+    margin: 0;
+}
+
+.exchange-detail-markets-item-container a {
+    text-decoration: none;
+    color: #000;
+}

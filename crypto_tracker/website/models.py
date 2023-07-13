@@ -53,8 +53,34 @@ class ExchangeModel(models.Model):
                 # "365d": self.get_price_change(31536000000, market)
                 }
         return markets_with_periods
-
     
+    @property
+    def get_info(self):
+        return self.exchange_instance.describe
+    
+
+    def fetch_ohlcv(self, get, symbol, timeframe='1m', since=None, limit=None, params={}):
+        all_symbol_current_prices = {}
+
+        #market = symbol.replace("/", "")
+        try:
+            result_instance = self.exchange_instance.fetch_ohlcv(symbol=symbol, timeframe=timeframe, since=since, limit=limit, params=params)[0]
+        except Exception as e:
+            print(e)
+        print(result_instance)
+        all_symbol_current_prices[symbol] = {
+            'timestamp': result_instance[0],
+            'open': result_instance[1],
+            'high': result_instance[2],
+            'low': result_instance[3],
+            'close': result_instance[4],
+            'volume': result_instance[5],
+            }
+        if get.lower() == 'all':
+            return all_symbol_current_prices
+        return all_symbol_current_prices[symbol][get]
+        #return self.exchange_instance.fetch_ohlcv(symbol, timeframe=timeframe, since=since, limit=limit, params=params)
+
     class Meta:
         verbose_name = _("Exchange model")
         verbose_name_plural = _("Exchange models")

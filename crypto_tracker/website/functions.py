@@ -14,4 +14,5 @@ def get_price_change(period=604800000, exchange=ccxt.binance(), symbol='BTCUSDT'
     result = current_price[4] / (period_price * 0.01)
     return f"{(result - 100):.2f}"
 
-print(get_price_change())
+def sort_time(list):
+    return list[3]

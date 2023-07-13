@@ -6,7 +6,7 @@ from django.views import generic
 from django.utils.translation import gettext_lazy as _
 from . import forms
 from . import models
-from .functions import get_price_change, CRYPTOGRAPHIC_KEY
+from .functions import get_price_change, sort_time, CRYPTOGRAPHIC_KEY
 
 #news stuff (news.html)
 from GoogleNews import GoogleNews
@@ -79,10 +79,13 @@ def index(request):
 def news(request):
     form = forms.NewsSearchBar()
     search = request.GET.get('search')
+    sort_option = request.GET.get('sort')
     if search:
         news_class = GoogleNews()
         news_class.get_news(search)
         articles = news_class.results(sort=True) # '<' not supported between instances of 'float' and 'datetime.datetime'
+        if sort_option == 'desc':
+            articles = articles.sort(key=sort_time)
     else:
         articles = None
     
@@ -97,8 +100,10 @@ class ExchangesListView(generic.ListView):
     template_name = 'tracker_site/exchanges_list.html'
     
     def get_queryset(self):
+        sort_option = self.request.GET.get('sort')
         qs = super().get_queryset()
-        qs = qs.all()
+        if sort_option == 'name':
+            qs = qs.order_by('exchange')
         return qs
     
 
@@ -111,12 +116,10 @@ class ExchangeDetailView(generic.DeleteView):
         obj = get_object_or_404(models.ExchangeModel, slug=self.kwargs['slug'])
         
         context['exchange'] = obj
-        context["markets"] = obj.exchange_markets.keys()
+        context["markets"] = list(obj.exchange_markets)[:1]
         # context["markets_with_periods"] = obj.get_markets_with_period_prices
         return context
     
-
-
 
 class Chart(generic.TemplateView):
     model = models.ExchangeModel

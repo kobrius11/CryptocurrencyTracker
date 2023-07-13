@@ -3,10 +3,22 @@
 {% block title %}Exchanges{% endblock title %}
 
 {% block content %}
-{% for exchange in exchangemodel_list %}
-    <a href={% url 'exchange_detail' exchange.slug %}>{{ exchange }}</a>
 
-{% endfor %}
+<div class="sort-buttons">
+    <a href="?sort=name">Sort by Name</a>
+  </div>
+
+<ul class="exchanges-wrapper">
+{% for exchange in exchangemodel_list %}
+    <a class="exchange-button" href={% url 'exchange_detail' exchange.slug %}>
+        <li class="exchanges-container">
+            <p>{{ exchange }}</p>
+            <img src="{{ exchange.get_info.urls.logo }}">
+        </li>
+    </a>
+    {% endfor %}
+</ul>
+
 
 
 {% endblock content %}

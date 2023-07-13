@@ -1,12 +1,44 @@
 {% extends 'base.html' %}
+{% load website_extras %}
 
 {% block title %}{{ exchange }}{% endblock title %}
 
 {% block content %}
-    <h2>{{ exchange }}</h2>
-    {% for market in markets %}
-        <p>{{ market }}-<p> {% comment %} {{ market.1h }}, {{ market.1d }}, {{ market.7d }}, {{ market.30d }}, {{ market.365d }} {% endcomment %}
-    
+<div class="exchange-detail-wrapper">
+    <div class="exchange-detail-container">
+        <img src="{{ exchange.get_info.urls.logo }}">
+        <h2>{{ exchange }}</h2>
+        <a href="{{ exchange.get_info.urls.www }}">{{ exchange }} url</a>
+    </div>
+</div>
+
+
+
+<div class="exchange-detail-markets-wrapper">
+    <h2>{{ exchange }} symbols </h2>
+    <h2> Price </h2>
+    <h2> 1h </h2>
+    <h2> 24h </h2>
+    <h2> 7d </h2>
+    <h2> 1h </h2>
+    <h2> Volume </h2>
+    <h2> Last 7d </h2>
+    <ul class="exchange-detail-markets-container">
+
+    {% for symbol in markets %}
+        <li class="exchange-detail-markets-item-container">
+            <p>{{ symbol }}</p>
+            <p>{% call_method exchange 'fetch_ohlcv' get="close" symbol=symbol limit=2 %}</p>
+            <p>{% call_method exchange 'get_price_change' period=3600000 symbol=symbol %}</p>
+            <p>{% call_method exchange 'get_price_change' period=86400000 symbol=symbol %}</p>
+            <p>{% call_method exchange 'get_price_change' period=604800000 symbol=symbol %}</p>
+            <p>{% call_method exchange 'fetch_ohlcv' get="volume" symbol=symbol limit=2 %}</p>
+            <a href="/chart/?exchange={{ exchange }}&currencies={{ symbol }}">chart</a> {% comment %} {{ market.1h }}, {{ market.1d }}, {{ market.7d }}, {{ market.30d }}, {{ market.365d }} {% endcomment %}
+            
+        </li>
     {% endfor %}
+    
+    </ul>
+</div>
 
 {% endblock content %}
