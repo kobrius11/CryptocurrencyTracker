@@ -82,7 +82,7 @@ def news(request):
     if search:
         news_class = GoogleNews()
         news_class.get_news(search)
-        articles = news_class.results(sort=True)
+        articles = news_class.results(sort=True) # '<' not supported between instances of 'float' and 'datetime.datetime'
     else:
         articles = None
     
