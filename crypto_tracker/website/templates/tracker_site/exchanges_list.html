@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Exchanges{% endblock title %}
+
+{% block content %}
+{% for exchange in exchangemodel_list %}
+    <a href={% url 'exchange_detail' exchange.slug %}>{{ exchange }}</a>
+
+{% endfor %}
+
+
+{% endblock content %}

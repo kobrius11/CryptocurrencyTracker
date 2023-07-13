@@ -11,7 +11,8 @@ class Command(BaseCommand):
         try:
             for exchange in ccxt.exchanges:
                 model = ExchangeModel.objects.create(
-                    exchange=exchange
+                    exchange=exchange,
+                    slug=exchange,
                     )
                 
                 model.save()

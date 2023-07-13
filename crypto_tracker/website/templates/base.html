@@ -33,6 +33,7 @@
                     </a>
                     </div>
                 </li>
+                <li class='navbar-item'><a class="button" href={% url 'exchanges_list' %}>Exchanges</a></li>
                 <li class='navbar-item'><a class="button" href={% url 'chart' %}>Chart</a></li>
                 <li class='navbar-item'><a class="button" href={% url 'news' %}>News</a></li>
                 {% if user.is_authenticated %}

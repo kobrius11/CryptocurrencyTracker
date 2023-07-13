@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ exchange }}{% endblock title %}
+
+{% block content %}
+    <h2>{{ exchange }}</h2>
+    {% for market in markets %}
+        <p>{{ market }}-<p> {% comment %} {{ market.1h }}, {{ market.1d }}, {{ market.7d }}, {{ market.30d }}, {{ market.365d }} {% endcomment %}
+    
+    {% endfor %}
+
+{% endblock content %}

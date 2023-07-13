@@ -3,4 +3,9 @@ from . import models
 # Register your models here.
 
 admin.site.register(models.ApiContainer)
-admin.site.register(models.ExchangeModel)
+
+
+class ExchangeModelAdmin(admin.ModelAdmin):
+    list_display = ("exchange", )
+    prepopulated_fields = {"slug": ("exchange", ), }
+admin.site.register(models.ExchangeModel, ExchangeModelAdmin)
