@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM python:slim-bullseye
+ENV PYTHONBUFFERED=1
 WORKDIR /app
 COPY ./crypto_tracker .
 COPY ./requirements.txt .

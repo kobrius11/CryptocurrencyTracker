@@ -165,3 +165,4 @@ crypto_tracker/media/
 crypto_tracker/website/media/
 crypto_tracker/website/static/css/media/
 ccxt_test/
+redis/

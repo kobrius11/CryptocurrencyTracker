@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 from . import local_settings
 
@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['cryptotracker.local', 'localhost']
 INSTALLED_APPS = [
     'website',
     'user_profile',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_results',
     'django_celery_beat',
+    # 'django_redis',
 ]
 
 MIDDLEWARE = [
@@ -142,17 +144,32 @@ MEDIA_ROOT = BASE_DIR.joinpath(MEDIA_URL)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#REDIS CONFIG
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',  # Redis service hostname and port
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
+
+#CELERY BEAT
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 #CELERY SETTINGS
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 
-CELERY_broker_url = 'redis://127.0.0.1:6379'
-accept_content = ['application/json']
-result_serializer = 'json'
-task_serializer = 'json'
-timezone = 'Europe/Vilnius'
-broker_connection_retry_on_startup = True
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Vilnius'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
-result_backend = 'django-db'
-
-# CELERY BEAT
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

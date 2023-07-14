@@ -4,10 +4,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic
 from django.utils.translation import gettext_lazy as _
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from . import forms
 from . import models
-from .functions import get_price_change, sort_time, CRYPTOGRAPHIC_KEY
-from .tasks import test_func
+from .functions import sort_time, CRYPTOGRAPHIC_KEY
+from .tasks import test_func, get_price_change
 
 #news stuff (news.html)
 from GoogleNews import GoogleNews
@@ -40,38 +42,38 @@ def index(request):
     context = {
         'articles': articles,
         'BTCUSDT': {'current': BTCUSDT, 
-                    '1h': get_price_change(period=3600000),
-                    '24h': get_price_change(period=86400000),
-                    # '7d': get_price_change(period=604800000),
-                    # '30d': get_price_change(period=2592000000),
-                    # '365d': get_price_change(period=31536000000)
+                    '1h': get_price_change.delay(period=3600000, symbol='BTCUSDT'),
+                    '24h': get_price_change.delay(period=86400000, symbol='BTCUSDT'),
+                    '7d': get_price_change.delay(period=604800000, symbol='BTCUSDT'),
+                    '30d': get_price_change.delay(period=2592000000, symbol='BTCUSDT'),
+                    '365d': get_price_change.delay(period=31536000000, symbol='BTCUSDT')
                     },
         'ETHUSDT': {'current': ETHUSDT, 
-                    '1h': get_price_change(period=3600000, symbol='ETHUSDT'),
-                    '24h': get_price_change(period=86400000, symbol='ETHUSDT'),
-                    # '7d': get_price_change(period=604800000, symbol='ETHUSDT'),
-                    # '30d': get_price_change(period=2592000000, symbol='ETHUSDT'),
-                    # '365d': get_price_change(period=31536000000, symbol='ETHUSDT')
+                    '1h': get_price_change.delay(period=3600000, symbol='ETHUSDT'), #period=3600000, symbol='ETHUSDT'
+                    '24h': get_price_change.delay(period=86400000, symbol='ETHUSDT'), #period=86400000, symbol='ETHUSDT'
+                    '7d': get_price_change.delay(period=604800000, symbol='ETHUSDT'), #period=604800000, symbol='ETHUSDT'
+                    '30d': get_price_change.delay(period=2592000000, symbol='ETHUSDT'), #period=2592000000, symbol='ETHUSDT'
+                    '365d': get_price_change.delay(period=31536000000, symbol='ETHUSDT') #period=31536000000, symbol='ETHUSDT'
                     },
         'BUSDUSDT': {'current': BUSDUSDT, 
-                    '1h': get_price_change(period=3600000, symbol='BUSDUSDT'),
-                    '24h': get_price_change(period=86400000, symbol='BUSDUSDT'),
-                    # '7d': get_price_change(period=604800000, symbol='BUSDUSDT'),
-                    # '30d': get_price_change(period=2592000000, symbol='BUSDUSDT'),
-                    # '365d': get_price_change(period=31536000000, symbol='BUSDUSDT')
+                    '1h': get_price_change.delay(period=3600000, symbol='BUSDUSDT'),
+                    '24h': get_price_change.delay(period=86400000, symbol='BUSDUSDT'),
+                    '7d': get_price_change.delay(period=604800000, symbol='BUSDUSDT'),
+                    '30d': get_price_change.delay(period=2592000000, symbol='BUSDUSDT'),
+                    '365d': get_price_change.delay(period=31536000000, symbol='BUSDUSDT')
                     },
-        # 'BNBUSDT': {'current': BNBUSDT, 
-        #             '1h': get_price_change(period=3600000, symbol='BNBUSDT'),
-        #             '24h': get_price_change(period=86400000, symbol='BNBUSDT'),
-        #             '7d': get_price_change(period=604800000, symbol='BNBUSDT'),
-        #             '30d': get_price_change(period=2592000000, symbol='BNBUSDT'),
-        #             '365d': get_price_change(period=31536000000, symbol='BNBUSDT')},
-        # 'USDCUSDT': {'current': USDCUSDT, 
-        #             '1h': get_price_change(period=3600000, symbol='USDCUSDT'),
-        #             '24h': get_price_change(period=86400000, symbol='USDCUSDT'),
-        #             '7d': get_price_change(period=604800000, symbol='USDCUSDT'),
-        #             '30d': get_price_change(period=2592000000, symbol='USDCUSDT'),
-        #             '365d': get_price_change(period=31536000000, symbol='USDCUSDT')},
+        'BNBUSDT': {'current': BNBUSDT, 
+                    '1h': get_price_change.delay(period=3600000, symbol='BNBUSDT'),
+                    '24h': get_price_change.delay(period=86400000, symbol='BNBUSDT'),
+                    '7d': get_price_change.delay(period=604800000, symbol='BNBUSDT'),
+                    '30d': get_price_change.delay(period=2592000000, symbol='BNBUSDT'),
+                    '365d': get_price_change.delay(period=31536000000, symbol='BNBUSDT')},
+        'USDCUSDT': {'current': USDCUSDT, 
+                    '1h': get_price_change.delay(period=3600000, symbol='USDCUSDT'),
+                    '24h': get_price_change.delay(period=86400000, symbol='USDCUSDT'),
+                    '7d': get_price_change.delay(period=604800000, symbol='USDCUSDT'),
+                    '30d': get_price_change.delay(period=2592000000, symbol='USDCUSDT'),
+                    '365d': get_price_change.delay(period=31536000000, symbol='USDCUSDT')},
     }
 
     return render(request, 'tracker_site/index.html', context)
@@ -108,18 +110,28 @@ class ExchangesListView(generic.ListView):
         return qs
     
 
-class ExchangeDetailView(generic.DeleteView):
+class ExchangeDetailView(APIView):
     model = models.ExchangeModel
     template_name = 'tracker_site/exchange_detail.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    
+    def get_price_change_async(self, period, symbol):
         obj = get_object_or_404(models.ExchangeModel, slug=self.kwargs['slug'])
-        
-        context['exchange'] = obj
-        context["markets"] = list(obj.exchange_markets)[:1]
-        # context["markets_with_periods"] = obj.get_markets_with_period_prices
-        return context
+        try:
+            task_result = get_price_change.delay(period=period, exchange_name='binance', symbol=symbol)
+            price = task_result.get()
+        except Exception as e:
+            return str(e)
+        return price
+    
+    def get(self, request, slug):
+        obj = get_object_or_404(models.ExchangeModel, slug=slug)
+        price = get_price_change.delay(period=86400000, exchange_name='binance', symbol='BTCUSDT')
+        data = {
+            'exchange': obj,
+            'price': price,
+        }
+        return Response(data)
     
 
 class Chart(generic.TemplateView):

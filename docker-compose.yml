@@ -11,8 +11,10 @@ services:
       - 8000:8000
     volumes:
       - ./crypto_tracker:/app
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
     depends_on:
       - db
+      - redis
     links:
       - db:postgres
     command: >
@@ -20,6 +22,11 @@ services:
                python manage.py migrate &&
                python manage.py collectstatic --noinput &&
                gunicorn crypto_tracker.wsgi --bind 0.0.0.0:8000"
+    environment:
+      - DEBUG=1
+      - CELERY_BROKER=redis://redis:6379/2
+      - CELERY_BACKEND=redis://redis:6379/3
+  
   db:
     image: postgres
     container_name: tracker_database.db
@@ -30,6 +37,7 @@ services:
       - ./dbdata:/var/lib/postgresql/data
     env_file:
       - ./crypto_tracker/crypto_tracker/local_settings.py
+  
   nginx:
     build: ./nginx/.
     image: nginx:crypto_tracker
@@ -43,30 +51,28 @@ services:
       - ./crypto_tracker/media:/app/media
       - ./crypto_tracker/static:/app/static
 
-  # redis:
-  #   container_name: redis
-  #   image: "redis:alpine"
-  
-  # celery:
-  #   build: 
-  #     context: ./crypto_tracker
-  #   command: celery -A core worker -l info
-  #   volumes:
-  #     - ./crypto_tracker:/app
-  #   env_file:
-  #     - ./.env
-  #   depends_on:
-  #     - crypto_tracker
-  #     - redis
-  
-  # celery-beat:
-  #   build: 
-  #     context: ./crypto_tracker
-  #   command: celery -A core beat -l info
-  #   volumes:
-  #     - ./crypto_tracker:/app
-  #   env_file:
-  #     - ./.env
-  #   depends_on:
-  #     - crypto_tracker
-  #     - redis
+  redis:
+    container_name: redis
+    image: redis:latest
+    expose:
+      - 6379
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf  # Path to your Redis configuration file
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+
+  celery_worker:
+    build: .
+    image: python:crypto_tracker
+    container_name: crypto_tracker.worker
+    restart: always
+    command: 
+      celery -A crypto_tracker worker --pool=prefork --concurrency=12 --autoscale=12,3 -l info
+
+    volumes:
+      - ./crypto_tracker:/app
+    depends_on:
+      - db
+      - redis
+    links:
+      - db:postgres
