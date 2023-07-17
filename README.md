@@ -34,7 +34,7 @@ To run Crypto Tracker locally, follow these steps:
 4. Create local_settings.py in crypto_tracker/crypto_tracker:
 
   ```python
-   #DJANGO SECRET KEY
+  #DJANGO SECRET KEY
   SECRET_KEY = you can get it from django.core.management.utils.get_random_secret_key(), or https://miniwebtool.com/django-secret-key-generator/
 
   #DATABASE SETTINGS
@@ -44,9 +44,9 @@ To run Crypto Tracker locally, follow these steps:
   POSTGRES_PASSWORD = 'pass'
   POSTGRES_PORT = 5432
 
-  
-  -KEY_INSTANCE = 32 byte key, generated from Fernet.generate_key(), you may find it in ecryption_config.py
-
+  # ENCRYPTION SETTINGS
+  KEY_INSTANCE = 32 byte key, generated from Fernet.generate_key(), you may find it in ecryption_config.py
+  ```
 5. Create docker images, and launch servers:
 
    ### You need to have wsl linux distro, if you are running on windows!
