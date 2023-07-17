@@ -1,22 +1,42 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load website_extras %}
-
 <div class='menu'>
     <ul class='menu-wrapper'>
-        {% comment %} <li class='menu-item'><a class="menu-button" href={% url '??' %}>Edit Container</a></li>
-        <li class='menu-item'><a class="menu-button" href={% url '??' %}></a>Delete Container</li> {% endcomment %}
+        {% comment %} <li class='menu-item'><a class="menu-button" href={% url '??' %}>Edit Container</a></li> {% endcomment %}
+        <li class='menu-item'><a class="menu-button" href="{% url 'dashboard_delete' api_obj.pk %}">Delete Container</a></li>
         
     </ul>
 </div>
 
+
 {% if api_obj %}
     <p>hello world!</p>
 {% endif %}
-{% if ccxt_obj %}
-    <p>{{ ccxt_obj }}</p>
-    <p>{{ ccxt_balance }}</p>
-{% endif %}
+<div class="exchange-detail-markets-wrapper">
+    <h2>coins</h2>
+    <h2>equity</h2>
+    <h2>walletBalance</h2>
+    <h2>h2ositionMargin</h2>
+    <h2>availableBalance</h2>
+    <h2>orderMargin</h2>
+    <h2>unrealisedpnl</h2>
+    <h2>RealisedPnl</h2>
+</div>
+<ul class="exchange-detail-markets-container">
+{% for coin_dict in ccxt_obj.info.result.list %}
+    <li class="exchange-detail-markets-item-container">
+        <p>{{ coin_dict.coin }}</p>
+        <p>{{ coin_dict.equity }}</p>
+        <p>{{ coin_dict.walletBalance }}</p>
+        <p>{{ coin_dict.positionMargin }}</p>
+        <p>{{ coin_dict.availableBalance }}</p>
+        <p>{{ coin_dict.orderMargin }}</p>
+        <p>{{ coin_dict.unrealisedPnl }}</p>
+        <p>{{ coin_dict.RealisedPnl }}</p>
+    </li>
+    {% endfor %}
+</ul>
 
 {% endblock content %}
 

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'user_profile',
     'rest_framework',
     'channels',
+    'daphne',
     'django_celery_results',
     'django_celery_beat',
     'django.contrib.admin',
@@ -147,6 +148,7 @@ MEDIA_ROOT = BASE_DIR.joinpath(MEDIA_URL)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 #REDIS CONFIG
 CACHES = {
@@ -163,7 +165,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('redis://redis'), 6379]
+            "hosts": [('redis://redis', 6379)],
         }
     }
 }

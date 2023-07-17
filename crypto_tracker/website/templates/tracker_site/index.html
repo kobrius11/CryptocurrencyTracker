@@ -13,11 +13,10 @@
     const priceSocket = new WebSocket(
       'ws://' + 
       window.location.host +
-      'ws/price/' +
+      '/ws/price/' +
       roomName +
       '/' +
-      '?' +
-      queryString
+      '?'
       );
   </script>
 
@@ -49,23 +48,21 @@
         With our secure and user-friendly Portfolio Tracker, taking control of your cryptocurrency investments has never been easier.</p>
     </section>
 
-    <section class="index-section">
+    <section class="index-section-articles">
       <h2>Cryptocurrency News</h2>
       <!-- Display cryptocurrency news feed or curated articles here -->
       <p>Stay informed and up-to-date with the ever-evolving world of cryptocurrencies through our comprehensive Cryptocurrency News feature on CryptocurrencyTracker. 
         Our platform provides you with a curated selection of the latest news, articles, and updates from reputable sources in the cryptocurrency industry. Discover the most relevant and insightful news stories, market analysis, regulatory developments, and technology advancements that shape the crypto landscape. With our intuitive news feed, you can quickly scan headlines, read concise summaries, and dive deeper into the full articles that catch your interest. Whether you're a crypto enthusiast, investor, or simply seeking reliable information, our Cryptocurrency News feature ensures you never miss a beat and stay ahead in this dynamic market. 
         Trust CryptocurrencyTracker as your go-to source for staying informed and making well-informed decisions in the world of cryptocurrencies.</p>
         {% for article in articles %}
-        <li class='article-container'>
+        <li class='article-container-mini'>
           <a href="https://{{ article.link }}" alt="Article Image">
-              <img src={{ article.img }}>
               {% if article.title|length > 107 %}
                   <p>{{ article.title|truncatewords:12 }}</p></a>
               {% else %}
               <p>{{ article.title }}</p></a>
               {% endif %}
-          <p>{{ article.datetime }}</p>
-          <p>{{ article.date }}</p>
+          </li>
         {% endfor %}
     </section>
 

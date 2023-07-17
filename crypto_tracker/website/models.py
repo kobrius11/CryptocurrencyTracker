@@ -37,7 +37,14 @@ class ExchangeModel(models.Model):
         if apiKey==None and secret==None:
             return self.exchange_instance
         elif apiKey and secret:
-            return getattr(ccxt, self.exchange)(config={'apiKey': apiKey, 'secret': CRYPTOGRAPHIC_KEY.decrypt(bytes(secret))})
+            exchange_class = getattr(ccxt, self.exchange)
+            decrypted_secret = CRYPTOGRAPHIC_KEY.decrypt(bytes(secret))
+            exchange = exchange_class({'apiKey': apiKey, 'secret': decrypted_secret.decode('UTF-8')})
+            exchange.load_markets()
+            return exchange.fetch_balance()
+            # exchange = exchange_class({'apiKey': apiKey, 'secret': decrypted_secret})
+            # balance = getattr(exchange, 'fetch_balance', lambda: None)()
+            # return balance
         
     @property
     def exchange_instance(self):

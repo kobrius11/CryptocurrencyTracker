@@ -17,11 +17,14 @@ app.config_from_object(settings, namespace='CELERY')
 
 #CELERY BEAT SETTINGS
 app.conf.beat_schedule = {
-    'every-10-seconds': {
-        'task': "website.tasks.get_price_change",
-        'schedule': 10,
-        'args': (['BTC', 'ETH'])
-    },
+    # 'every_10_seconds': {
+    #     'task': "BTCUSDT",
+    #     'schedule': 10,
+    #     'kwargs': {
+    #         'period': 3600000,
+    #         'symbol': 'BTCUSDT'
+    #     }
+    # },
 }
 
 
