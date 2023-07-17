@@ -2,7 +2,9 @@ from __future__ import absolute_import, unicode_literals
 import os
 
 from celery import Celery
+from celery.schedules import crontab
 from django.conf import settings
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'crypto_tracker.settings')
 
@@ -15,7 +17,11 @@ app.config_from_object(settings, namespace='CELERY')
 
 #CELERY BEAT SETTINGS
 app.conf.beat_schedule = {
-    
+    'every-10-seconds': {
+        'task': "website.tasks.get_price_change",
+        'schedule': 10,
+        'args': (['BTC', 'ETH'])
+    },
 }
 
 

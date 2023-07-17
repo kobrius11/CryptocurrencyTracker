@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load website_extras %}
 
 <div class='menu'>
     <ul class='menu-wrapper'>
@@ -13,7 +14,8 @@
     <p>hello world!</p>
 {% endif %}
 {% if ccxt_obj %}
-    <p>{% ccxt_obj.fetch_ohlcv('BTCUSDT', limit=1000) %}</p>
+    <p>{{ ccxt_obj }}</p>
+    <p>{{ ccxt_balance }}</p>
 {% endif %}
 
 {% endblock content %}

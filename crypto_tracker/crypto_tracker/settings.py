@@ -35,14 +35,16 @@ INSTALLED_APPS = [
     'website',
     'user_profile',
     'rest_framework',
+    'channels',
+    'django_celery_results',
+    'django_celery_beat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_celery_results',
-    'django_celery_beat',
+    
     # 'django_redis',
 ]
 
@@ -75,6 +77,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'crypto_tracker.wsgi.application'
+ASGI_APPLICATION = "crypto_tracker.asgi.application"
 
 
 # Database
@@ -143,6 +146,7 @@ MEDIA_ROOT = BASE_DIR.joinpath(MEDIA_URL)
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_REDIRECT_URL = '/'
 
 #REDIS CONFIG
 CACHES = {
@@ -155,6 +159,15 @@ CACHES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis://redis'), 6379]
+        }
+    }
+}
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 
@@ -163,8 +176,9 @@ SESSION_CACHE_ALIAS = 'default'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 #CELERY SETTINGS
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
@@ -172,4 +186,3 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Vilnius'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

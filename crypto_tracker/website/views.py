@@ -4,12 +4,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic
 from django.utils.translation import gettext_lazy as _
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.forms.models import model_to_dict
 from . import forms
 from . import models
 from .functions import sort_time, CRYPTOGRAPHIC_KEY
 from .tasks import test_func, get_price_change
+from crypto_tracker.celery import debug_task
 
 #news stuff (news.html)
 from GoogleNews import GoogleNews
@@ -24,7 +27,8 @@ def index(request):
     # get latest news
     search_terms = ['Crypto', 'Stocks', 'Forex', 'Futures', 'Indices', 'Bonds']
     articles = []
-
+    print(test_func.delay())
+    debug_task.delay()
     for term in search_terms:
         news_class = GoogleNews()
         news_class.get_news(term)
@@ -41,6 +45,7 @@ def index(request):
 
     context = {
         'articles': articles,
+        'room_name': 'track',
         'BTCUSDT': {'current': BTCUSDT, 
                     '1h': get_price_change.delay(period=3600000, symbol='BTCUSDT'),
                     '24h': get_price_change.delay(period=86400000, symbol='BTCUSDT'),
@@ -127,8 +132,11 @@ class ExchangeDetailView(APIView):
     def get(self, request, slug):
         obj = get_object_or_404(models.ExchangeModel, slug=slug)
         price = get_price_change.delay(period=86400000, exchange_name='binance', symbol='BTCUSDT')
+
+        exchange_data = model_to_dict(obj)
+
         data = {
-            'exchange': obj,
+            'exchange': obj.exchange,
             'price': price,
         }
         return Response(data)
@@ -175,36 +183,33 @@ class DashboardDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        obj = get_object_or_404(models.ApiContainer, id=self.kwargs['pk'])
-        print(bytes(obj.secret_key))
-        print(obj.secret_key)
-        print(obj.secret_key)
-        context["api_obj"] = obj
-        context["ccxt_obj"] = getattr(ccxt, obj.exchange)(config={
-            'apiKey': obj.apikey,
-            'secret': CRYPTOGRAPHIC_KEY.decrypt(bytes(obj.secret_key)),
-        })
+        api_obj = get_object_or_404(models.ApiContainer, id=self.kwargs['pk'])
+        ccxt_obj = get_object_or_404(models.ExchangeModel, exchange=api_obj.exchange)
+
+        context["api_obj"] = api_obj
+        context["ccxt_obj"] = ccxt_obj.exchange_instance_with_api(
+            apiKey=api_obj.apikey,
+            secret=api_obj.secret_key
+        )
+        context["ccxt_balance"] = ccxt_obj.exchange_instance_with_api(
+            apiKey=api_obj.apikey,
+            secret=api_obj.secret_key
+        ).fetch_balance()
         return context
     
 
 class DashboardCreateView(LoginRequiredMixin, generic.CreateView):
     model = models.ApiContainer
     form_class = forms.ApiContainerCreateForm 
-    #f.modelform_factory(model, form=f.ModelForm, fields={
-    #     'exchange': f.ChoiceField(label=_('exchange'), choices=ccxt.exchanges),
-    #     'name': f.ChoiceField(label=_('exchange'), choices=ccxt.exchanges), 
-    #     'apikey': f.CharField(label=_('API')), 
-    #     'secret_key': f.PasswordInput()
-    #     })
     template_name = 'tracker_site/dashboard_create.html'
     success_url = reverse_lazy('dashboard_list')
 
     def form_valid(self, form):
         form = super().get_form(self.form_class)
-        form.instance.user = self.request.user
+        instance = form.save(commit=False)
         form.save(False)
         result = bytes(form.cleaned_data['secret_key_text'], encoding='utf-8')
         form.instance.secret_key = CRYPTOGRAPHIC_KEY.encrypt(result) 
         # form.instance.secret_key = make_password(form.cleaned_data['secret_key'], salt=local_settings.HASHING_SALT)[33:]
-        form.save(False)
+        form.instance.user = self.request.user
         return super().form_valid(form)

@@ -1,6 +1,6 @@
 import ccxt
 import pandas as pd
-from celery import shared_task, Task
+from celery import shared_task
 
 @shared_task(bind=True)
 def test_func(self):
@@ -9,8 +9,8 @@ def test_func(self):
         print(i)
     return "Done"
 
-@shared_task
-def get_price_change(period=86400000, exchange_name='binance', symbol="BTCUSDT"):
+@shared_task(bind=True)
+def get_price_change(self, period=86400000, exchange_name='binance', symbol="BTCUSDT"):
     # hour=3600000, day=86400000, week=604800000, month(30days)=2592000000, year=31536000000
     exchange = getattr(ccxt, exchange_name)()
     current_price = exchange.fetch_ohlcv(symbol, limit=2)[0]

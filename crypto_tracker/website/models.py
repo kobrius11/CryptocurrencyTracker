@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 import ccxt
 from .tasks import test_func, get_price_change
 from celery import shared_task
+from .functions import CRYPTOGRAPHIC_KEY
 
 
 class ApiContainer(models.Model):
@@ -30,7 +31,14 @@ class ApiContainer(models.Model):
 class ExchangeModel(models.Model):
     exchange = models.CharField(_("exchange"), max_length=50)
     slug = models.SlugField(default="", null=False)
+    
 
+    def exchange_instance_with_api(self, apiKey=None, secret=None):
+        if apiKey==None and secret==None:
+            return self.exchange_instance
+        elif apiKey and secret:
+            return getattr(ccxt, self.exchange)(config={'apiKey': apiKey, 'secret': CRYPTOGRAPHIC_KEY.decrypt(bytes(secret))})
+        
     @property
     def exchange_instance(self):
         return getattr(ccxt, self.exchange)()

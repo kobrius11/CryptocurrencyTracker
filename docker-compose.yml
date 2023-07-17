@@ -22,6 +22,7 @@ services:
                python manage.py migrate &&
                python manage.py collectstatic --noinput &&
                gunicorn crypto_tracker.wsgi --bind 0.0.0.0:8000"
+
     environment:
       - DEBUG=1
       - CELERY_BROKER=redis://redis:6379/2
@@ -51,6 +52,29 @@ services:
       - ./crypto_tracker/media:/app/media
       - ./crypto_tracker/static:/app/static
 
+  # daphne_service:
+  #   build: .
+  #   image: python:crypto_tracker
+  #   container_name: crypto_tracker.dap
+  #   tty: true
+  #   stdin_open: true
+  #   restart: always
+  #   ports:
+  #     - 8001:8001
+  #   volumes:
+  #     - ./crypto_tracker:/app
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   links:
+  #     - db:postgres
+  #   command: >
+  #     bash -c "python wait_for_postgres.py &&
+  #              python manage.py migrate &&
+  #              daphne -b 0.0.0.0 -p 8001 crypto_tracker.asgi:application"
+
   redis:
     container_name: redis
     image: redis:latest
@@ -60,14 +84,14 @@ services:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf  # Path to your Redis configuration file
     command: redis-server /usr/local/etc/redis/redis.conf
 
-
   celery_worker:
     build: .
     image: python:crypto_tracker
     container_name: crypto_tracker.worker
     restart: always
-    command: 
-      celery -A crypto_tracker worker --pool=prefork --concurrency=12 --autoscale=12,3 -l info
+    command: >
+      bash -c "celery -A crypto_tracker worker --pool=prefork --concurrency=12 --autoscale=12,3 -l info &&
+               celery -A crypto_tracker beat -l info"
 
     volumes:
       - ./crypto_tracker:/app
