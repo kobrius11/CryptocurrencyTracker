@@ -28,26 +28,26 @@ services:
       - CELERY_BROKER=redis://redis:6379/2
       - CELERY_BACKEND=redis://redis:6379/3
   
-  daphne_service:
-    build: .
-    image: python:crypto_tracker
-    container_name: daphne
-    tty: true
-    stdin_open: true
-    restart: always
-    ports:
-      - 8001:8001
-    volumes:
-      - ./crypto_tracker:/app
-    depends_on:
-      - db
-      - redis
-    links:
-      - db:postgres
-    command: >
-      bash -c "python wait_for_postgres.py &&
-               python manage.py migrate &&
-               daphne -b 0.0.0.0 -p 8001 crypto_tracker.asgi:application"
+  # daphne_service:
+  #   build: .
+  #   image: python:crypto_tracker
+  #   container_name: daphne
+  #   tty: true
+  #   stdin_open: true
+  #   restart: always
+  #   ports:
+  #     - 8001:8001
+  #   volumes:
+  #     - ./crypto_tracker:/app
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   links:
+  #     - db:postgres
+  #   command: >
+  #     bash -c "python wait_for_postgres.py &&
+  #              python manage.py migrate &&
+  #              daphne -b 0.0.0.0 -p 8001 crypto_tracker.asgi:application"
 
   db:
     image: postgres

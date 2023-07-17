@@ -3,10 +3,16 @@
 {% block title %}Exchanges{% endblock title %}
 
 {% block content %}
+<div class='menu'>
+    <div class='menu-wrapper'>
+        {% if request.GET.sort == "name" %}
+            <a class="menu-button" href="?sort=">unsort</a>
+        {% else %}
+            <a class="menu-button" href="?sort=name">Sort by Name</a>
+        {% endif %}
+    </div>
+</div>
 
-<div class="sort-buttons">
-    <a href="?sort=name">Sort by Name</a>
-  </div>
 
 <ul class="exchanges-wrapper">
 {% for exchange in exchangemodel_list %}

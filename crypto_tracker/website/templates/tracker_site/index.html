@@ -2,8 +2,6 @@
 {% block title %}Cryptocurrency tracker{% endblock title %}
 {% block content %}
 
-
-{% comment %}   {% endcomment %}
   {{ room_name|json_script:"room-name" }}
   <script>
     const roomName = JSON.parse(document.getElementById('room-name').textContent)
@@ -22,9 +20,9 @@
 
 
   <header class="index-header">
-    <h1>Welcome to CryptocurrencyTracker!</h1>
-    <!-- Add any additional header content here -->
-    <p>Stay updated with real-time cryptocurrency prices and charts on CryptocurrencyTracker,
+    <h1 class="welcome-text">Welcome to CryptocurrencyTracker!</h1>
+    
+    <p class="slogan">Stay updated with real-time cryptocurrency prices and charts on CryptocurrencyTracker,
       track your cryptocurrency portfolio and monitor your investments with ease.</p>
 
   </header>
@@ -32,17 +30,19 @@
   <main class="index-section-wrapper">
     <section class="index-section">
       <h2>Real-Time Cryptocurrency Prices</h2>
-      <!-- Display real-time cryptocurrency prices and charts here -->
+      
       <p>CryptocurrencyTracker's Real-Time Cryptocurrency Prices feature provides you with up-to-the-minute data on the prices and changes in value for a wide range of cryptocurrencies. 
           Stay informed and make informed trading decisions with our live price charts, which offer comprehensive insights into the market trends and fluctuations.</p>
-      <p>{{ BTCUSDT.current }}
-      {{ BTCUSDT.1h }}
-      {{ BTCUSDT.24h }}</p>
+      <p>BTCUSDT Current price {{ BTCUSDT.current }}</p>
+      <p>ETHUSDT Current price {{ ETHUSDT.current }}</p>
+      <p>BUSUSDT Current price {{ BUSDUSDT.current }}</p>
+      <p>BNBUSDT Current price {{ BNBUSDT.current }}</p>
+      <p>USDCUSDT Current price {{ USDCUSDT.current }}</p>
     </section>
 
     <section class="index-section">
       <h2>Portfolio Tracker</h2>
-      <!-- Add portfolio tracking functionality and visualization here -->
+      
       <p>Manage your cryptocurrency investments seamlessly with our advanced Portfolio Tracker feature on CryptocurrencyTracker. 
         Our Portfolio Tracker empowers you to effortlessly monitor and analyze your cryptocurrency holdings in one centralized platform. Whether you're a seasoned trader or just getting started, our intuitive interface allows you to easily add, track, and evaluate your portfolio's performance. Gain valuable insights with interactive charts and graphs that visualize your asset allocation, historical trends, and profit/loss calculations. Stay informed about individual coin prices, percentage changes, and market trends, enabling you to make informed investment decisions. 
         With our secure and user-friendly Portfolio Tracker, taking control of your cryptocurrency investments has never been easier.</p>
@@ -50,7 +50,7 @@
 
     <section class="index-section-articles">
       <h2>Cryptocurrency News</h2>
-      <!-- Display cryptocurrency news feed or curated articles here -->
+      
       <p>Stay informed and up-to-date with the ever-evolving world of cryptocurrencies through our comprehensive Cryptocurrency News feature on CryptocurrencyTracker. 
         Our platform provides you with a curated selection of the latest news, articles, and updates from reputable sources in the cryptocurrency industry. Discover the most relevant and insightful news stories, market analysis, regulatory developments, and technology advancements that shape the crypto landscape. With our intuitive news feed, you can quickly scan headlines, read concise summaries, and dive deeper into the full articles that catch your interest. Whether you're a crypto enthusiast, investor, or simply seeking reliable information, our Cryptocurrency News feature ensures you never miss a beat and stay ahead in this dynamic market. 
         Trust CryptocurrencyTracker as your go-to source for staying informed and making well-informed decisions in the world of cryptocurrencies.</p>
@@ -68,36 +68,37 @@
 
     <section class="index-section"> 
       <h2>Educational Resources</h2>
-      <!-- Provide educational materials, guides, and resources here -->
+      
       <p>Access a wealth of educational resources and guides on CryptocurrencyTracker to deepen your understanding of cryptocurrencies and blockchain technology</p>
-      <a href="https://www.babypips.com"></a>
-      <a href="https://www.tradingview.com"></a>
-      <a href="https://www.fool.com"></a>
-      <a href="https://www.investopedia.com"></a>
-      <a href="https://www.coinmarketcap.com"></a>
-      <a href="https://www.investimonials.com"></a>
-      <a href="https://www.financialmodelingprep.com"></a>
-      <a href="https://www.optionsplaybook.com"></a>
-      <a href="https://www.stockcharts.com"></a>
-      <a href="https://www.optionsplaybook.com"></a>
+      <div class="menu">  
+        <a class="menu-button" href="https://www.babypips.com">babypips.com</a>
+        <a class="menu-button" href="https://www.tradingview.com">tradingview.com</a>
+        <a class="menu-button" href="https://www.fool.com">fool.com</a>
+        <a class="menu-button" href="https://www.investopedia.com">investopedia.com</a>
+        <a class="menu-button" href="https://www.coinmarketcap.com">coinmarketcap.com</a>
+        <a class="menu-button" href="https://www.investimonials.com">investimonials.com</a>
+        <a class="menu-button" href="https://www.financialmodelingprep.com">financialmodelingprep.com</a>
+        <a class="menu-button" href="https://www.optionsplaybook.com">optionsplaybook.com</a>
+        <a class="menu-button" href="https://www.stockcharts.com">stockcharts.com</a>
+      </div>
     </section>
 
-    <section class="index-section">
+    {% comment %} <section class="index-section">
       <h2>Top Gainers and Losers</h2>
-      <!-- Show top gaining and losing cryptocurrencies here -->
+      
       <p>Track the top gainers and losers in the cryptocurrency market with CryptocurrencyTracker.</p>
       
-    </section>
+    </section> {% endcomment %}
 
-    <section class="index-section">
+    {% comment %} <section class="index-section">
       <h2>Social Media Integration</h2>
-      <!-- Add social media links and widgets here -->
+      
       <p>Connect through social media.</p>
-    </section>
+    </section> {% endcomment %}
 
     <section class="index-section">
       <h2>About Us</h2>
-      <!-- Provide information about the website and the team here -->
+      
       <p>At CryptocurrencyTracker, we are passionate about providing you with a comprehensive platform to navigate the exciting world of cryptocurrencies. With the rapid growth and innovation in the crypto space, we understand the need for a reliable and user-friendly resource that keeps you informed and empowered. 
         Our team of dedicated professionals brings together expertise in cryptocurrency, technology, and finance to create an all-in-one solution for enthusiasts, traders, and investors. 
         Whether you are looking for real-time price tracking, portfolio management tools, educational resources, or the latest news updates, CryptocurrencyTracker is your go-to destination.</p>
@@ -107,14 +108,14 @@
         With a user-centric approach, we continually enhance our features and user experience, ensuring that CryptocurrencyTracker remains your trusted source for all things crypto.</p>
     </section>
 
-    <section class="index-section">
+    {% comment %} <section class="index-section">
       <h2>Contact Information</h2>
-      <!-- Display contact form or contact details here -->
-    </section>
+      
+    </section> {% endcomment %}
 
     <section class="index-section">
       <h2>Disclaimer</h2>
-      <!-- Display a disclaimer about the information provided here -->
+      
       <p>The information provided on CryptocurrencyTracker is for informational purposes only and should not be considered financial or investment advice. 
         We strive to ensure the accuracy and timeliness of the information presented, but we make no warranties or guarantees regarding its completeness, reliability, or suitability for any purpose. Cryptocurrency investments carry inherent risks, and users should conduct their own research and consult with a qualified financial advisor before making any investment decisions. We do not endorse or promote any specific cryptocurrencies, projects, or services mentioned on the website. 
         Use CryptocurrencyTracker at your own discretion, and understand that all investment decisions are made at your own risk.</p>

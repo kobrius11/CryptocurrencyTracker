@@ -33,7 +33,7 @@ class ExchangeModel(models.Model):
     slug = models.SlugField(default="", null=False)
     
 
-    def exchange_instance_with_api(self, apiKey=None, secret=None):
+    def exchange_instance_balance(self, apiKey=None, secret=None):
         if apiKey==None and secret==None:
             return self.exchange_instance
         elif apiKey and secret:
@@ -42,10 +42,7 @@ class ExchangeModel(models.Model):
             exchange = exchange_class({'apiKey': apiKey, 'secret': decrypted_secret.decode('UTF-8')})
             exchange.load_markets()
             return exchange.fetch_balance()
-            # exchange = exchange_class({'apiKey': apiKey, 'secret': decrypted_secret})
-            # balance = getattr(exchange, 'fetch_balance', lambda: None)()
-            # return balance
-        
+    
     @property
     def exchange_instance(self):
         return getattr(ccxt, self.exchange)()
@@ -60,11 +57,10 @@ class ExchangeModel(models.Model):
             price = task_result.get()
         except Exception as e:
             return f"get_price_change: {e}"
-        return price
-        # if price.find('-'):
-        #     return mark_safe(f"<p style='color: green'>{price}</p>")
-        # else:
-        #     return mark_safe(f"<p style='color: red'>{price}</p>")
+        if price['result'].find('-'):
+            return mark_safe(f"<p style='color: green'>{price['result']}</p>")
+        else:
+            return mark_safe(f"<p style='color: red'>{price['result']}</p>")
     
     @property
     def get_markets_with_period_prices(self):
@@ -84,11 +80,10 @@ class ExchangeModel(models.Model):
     def get_info(self):
         return self.exchange_instance.describe
     
-    @shared_task(bind=True)
+    # @shared_task(bind=True)
     def fetch_ohlcv(self, get, symbol, timeframe='1m', since=None, limit=None, params={}):
         all_symbol_current_prices = {}
 
-        #market = symbol.replace("/", "")
         try:
             result_instance = self.exchange_instance.fetch_ohlcv(symbol=symbol, timeframe=timeframe, since=since, limit=limit, params=params)[0]
         except Exception as e:

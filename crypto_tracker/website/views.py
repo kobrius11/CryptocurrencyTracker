@@ -4,28 +4,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views import generic
-from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.forms.models import model_to_dict
 from . import forms
 from . import models
 from .functions import sort_time, CRYPTOGRAPHIC_KEY
-from .tasks import test_func, get_price_change
-from crypto_tracker.celery import debug_task
-
+# Celery stuff
 from celery import current_app as app
 from django_celery_beat.models import PeriodicTask
 from celery.result import AsyncResult
 #news stuff (news.html)
 from GoogleNews import GoogleNews
-
 # ccxt stuff (chart.html)
 import ccxt
-import pandas as pd
-
 
 
 # Create your views here.
@@ -33,8 +23,6 @@ def index(request):
     # get latest news
     search_terms = ['Crypto', 'Stocks', 'Forex', 'Futures', 'Indices', 'Bonds']
     articles = []
-    print(test_func.delay())
-    debug_task.delay()
     for term in search_terms:
         news_class = GoogleNews()
         news_class.get_news(term)
@@ -49,45 +37,47 @@ def index(request):
     BNBUSDT = exchange.fetch_ohlcv('BNBUSDT', limit=2)[0][4] # BINANCECOIN / USDT
     USDCUSDT = exchange.fetch_ohlcv('USDCUSDT', limit=2)[0][4] # USDCOIN / USDT
 
-    BTCUSDT_24h_task = PeriodicTask.objects.filter(name="BTCUSDT")
-    BTCUSDT_24h_result = BTCUSDT_24h_task.first().result if BTCUSDT_24h_task.first().ready() else None
+    # BTCUSDT_24h_task = PeriodicTask.objects.filter(name="BTCUSDT")
+    # BTCUSDT_24h_result = BTCUSDT_24h_task.first().result if BTCUSDT_24h_task.first().ready() else None
 
     context = {
         'articles': articles,
         'room_name': 'track',
         'BTCUSDT': {'current': BTCUSDT, 
-                    '1h': BTCUSDT_24h_result,}
-        #             '24h': get_price_change.delay(period=86400000, symbol='BTCUSDT'),
-        #             '7d': get_price_change.delay(period=604800000, symbol='BTCUSDT'),
-        #             '30d': get_price_change.delay(period=2592000000, symbol='BTCUSDT'),
-        #             '365d': get_price_change.delay(period=31536000000, symbol='BTCUSDT')
-        #             },
-        # 'ETHUSDT': {'current': ETHUSDT, 
-        #             '1h': get_price_change.delay(period=3600000, symbol='ETHUSDT'), #period=3600000, symbol='ETHUSDT'
-        #             '24h': get_price_change.delay(period=86400000, symbol='ETHUSDT'), #period=86400000, symbol='ETHUSDT'
-        #             '7d': get_price_change.delay(period=604800000, symbol='ETHUSDT'), #period=604800000, symbol='ETHUSDT'
-        #             '30d': get_price_change.delay(period=2592000000, symbol='ETHUSDT'), #period=2592000000, symbol='ETHUSDT'
-        #             '365d': get_price_change.delay(period=31536000000, symbol='ETHUSDT') #period=31536000000, symbol='ETHUSDT'
-        #             },
-        # 'BUSDUSDT': {'current': BUSDUSDT, 
-        #             '1h': get_price_change.delay(period=3600000, symbol='BUSDUSDT'),
-        #             '24h': get_price_change.delay(period=86400000, symbol='BUSDUSDT'),
-        #             '7d': get_price_change.delay(period=604800000, symbol='BUSDUSDT'),
-        #             '30d': get_price_change.delay(period=2592000000, symbol='BUSDUSDT'),
-        #             '365d': get_price_change.delay(period=31536000000, symbol='BUSDUSDT')
-        #             },
-        # 'BNBUSDT': {'current': BNBUSDT, 
-        #             '1h': get_price_change.delay(period=3600000, symbol='BNBUSDT'),
-        #             '24h': get_price_change.delay(period=86400000, symbol='BNBUSDT'),
-        #             '7d': get_price_change.delay(period=604800000, symbol='BNBUSDT'),
-        #             '30d': get_price_change.delay(period=2592000000, symbol='BNBUSDT'),
-        #             '365d': get_price_change.delay(period=31536000000, symbol='BNBUSDT')},
-        # 'USDCUSDT': {'current': USDCUSDT, 
-        #             '1h': get_price_change.delay(period=3600000, symbol='USDCUSDT'),
-        #             '24h': get_price_change.delay(period=86400000, symbol='USDCUSDT'),
-        #             '7d': get_price_change.delay(period=604800000, symbol='USDCUSDT'),
-        #             '30d': get_price_change.delay(period=2592000000, symbol='USDCUSDT'),
-        #             '365d': get_price_change.delay(period=31536000000, symbol='USDCUSDT')},
+                    # '1h': BTCUSDT_24h_result,}
+                    # '24h': get_price_change.delay(period=86400000, symbol='BTCUSDT'),
+                    # '7d': get_price_change.delay(period=604800000, symbol='BTCUSDT'),
+                    # '30d': get_price_change.delay(period=2592000000, symbol='BTCUSDT'),
+                    # '365d': get_price_change.delay(period=31536000000, symbol='BTCUSDT')
+                    },
+        'ETHUSDT': {'current': ETHUSDT, 
+                    # '1h': get_price_change.delay(period=3600000, symbol='ETHUSDT'), #period=3600000, symbol='ETHUSDT'
+                    # '24h': get_price_change.delay(period=86400000, symbol='ETHUSDT'), #period=86400000, symbol='ETHUSDT'
+                    # '7d': get_price_change.delay(period=604800000, symbol='ETHUSDT'), #period=604800000, symbol='ETHUSDT'
+                    # '30d': get_price_change.delay(period=2592000000, symbol='ETHUSDT'), #period=2592000000, symbol='ETHUSDT'
+                    # '365d': get_price_change.delay(period=31536000000, symbol='ETHUSDT') #period=31536000000, symbol='ETHUSDT'
+                    },
+        'BUSDUSDT': {'current': BUSDUSDT, 
+                    # '1h': get_price_change.delay(period=3600000, symbol='BUSDUSDT'),
+                    # '24h': get_price_change.delay(period=86400000, symbol='BUSDUSDT'),
+                    # '7d': get_price_change.delay(period=604800000, symbol='BUSDUSDT'),
+                    # '30d': get_price_change.delay(period=2592000000, symbol='BUSDUSDT'),
+                    # '365d': get_price_change.delay(period=31536000000, symbol='BUSDUSDT')
+                    },
+        'BNBUSDT': {'current': BNBUSDT, 
+                    # '1h': get_price_change.delay(period=3600000, symbol='BNBUSDT'),
+                    # '24h': get_price_change.delay(period=86400000, symbol='BNBUSDT'),
+                    # '7d': get_price_change.delay(period=604800000, symbol='BNBUSDT'),
+                    # '30d': get_price_change.delay(period=2592000000, symbol='BNBUSDT'),
+                    # '365d': get_price_change.delay(period=31536000000, symbol='BNBUSDT')
+                    },
+        'USDCUSDT': {'current': USDCUSDT, 
+                    # '1h': get_price_change.delay(period=3600000, symbol='USDCUSDT'),
+                    # '24h': get_price_change.delay(period=86400000, symbol='USDCUSDT'),
+                    # '7d': get_price_change.delay(period=604800000, symbol='USDCUSDT'),
+                    # '30d': get_price_change.delay(period=2592000000, symbol='USDCUSDT'),
+                    # '365d': get_price_change.delay(period=31536000000, symbol='USDCUSDT')
+                    },
     }
 
     return render(request, 'tracker_site/index.html', context)
@@ -110,7 +100,7 @@ def news(request):
         'articles': articles,
         'form': form,
     }
-    return render(request, 'tracker_site/news.html', context=context)
+    return render(request, 'tracker_site/news.html', context)
 
 class ExchangesListView(generic.ListView):
     model = models.ExchangeModel
@@ -124,36 +114,21 @@ class ExchangesListView(generic.ListView):
         return qs
     
 
-class ExchangeDetailView(APIView):
+class ExchangeDetailView(generic.DeleteView):
     model = models.ExchangeModel
     template_name = 'tracker_site/exchange_detail.html'
 
-    
-    def get_price_change_async(self, period, symbol):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         obj = get_object_or_404(models.ExchangeModel, slug=self.kwargs['slug'])
-        try:
-            task_result = get_price_change.delay(period=period, exchange_name='binance', symbol=symbol)
-            price = task_result.get()
-        except Exception as e:
-            return str(e)
-        return price
-    
-    def get(self, request, slug):
-        obj = get_object_or_404(models.ExchangeModel, slug=slug)
-        price = get_price_change.delay(period=86400000, exchange_name='binance', symbol='BTCUSDT')
 
-        exchange_data = model_to_dict(obj)
-
-        data = {
-            'exchange': obj.exchange,
-            'price': price,
-        }
-        return Response(data)
+        context['exchange'] = obj
+        context["markets"] = list(obj.exchange_markets.keys())[:3]
+        return context
     
 
 class Chart(generic.TemplateView):
     model = models.ExchangeModel
-    # form_class = forms.ChartForm()
     template_name = 'tracker_site/chart.html'
     success_url = reverse_lazy('chart')
 
@@ -197,7 +172,7 @@ class DashboardDetailView(LoginRequiredMixin, generic.DetailView):
         ccxt_obj = get_object_or_404(models.ExchangeModel, exchange=api_obj.exchange)
 
         context["api_obj"] = api_obj
-        context["ccxt_obj"] = ccxt_obj.exchange_instance_with_api(
+        context["balance"] = ccxt_obj.exchange_instance_balance(
             apiKey=api_obj.apikey,
             secret=api_obj.secret_key
         )
